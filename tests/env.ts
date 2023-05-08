@@ -9,13 +9,25 @@ export class TestEnviroment {
     VotingInfo: anchor.web3.PublicKey;
     VotingBump: number;
 
+    Party: anchor.web3.PublicKey;
+    PartyBump: number;
+
     VotingAuthority: anchor.web3.Keypair;
     NewVotingAuthority: anchor.web3.Keypair;
+
+    PartyCreator: anchor.web3.Keypair;
+
+    mint: anchor.web3.PublicKey;
+    token_account: anchor.web3.PublicKey;
+
+    metadata_account: anchor.web3.PublicKey;
+    metadata_account_bump: number;
 
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
         this.NewVotingAuthority = anchor.web3.Keypair.generate();
+        this.PartyCreator = anchor.web3.Keypair.generate();
 
     }
 }

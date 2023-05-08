@@ -7,10 +7,11 @@ pub mod error;
 pub mod instructions;
 pub mod states;
 
-declare_id!("CMBTneJJ1youyuhCW6rwwxmgy2Cb2vRuSECRjkMFmg9k");
+declare_id!("fZiPQcexEoTQJxdzwKEaCwMTMtnX1b7PSjPmoBoM3mj");
 
 #[program]
 pub mod janecek_method {
+
     use super::*;
 
     pub fn initialize_voting(
@@ -25,5 +26,14 @@ pub mod janecek_method {
         new_voting_authority: Pubkey,
     ) -> Result<()> {
         instructions::update_voting_info(ctx, new_voting_authority)
+    }
+    pub fn stop_voting(ctx: Context<SetEmergency>) -> Result<()> {
+        instructions::stop_voting(ctx)
+    }
+    pub fn reset_voting(ctx: Context<SetEmergency>) -> Result<()> {
+        instructions::reset_voting(ctx)
+    }
+    pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
+        instructions::add_party(ctx)
     }
 }

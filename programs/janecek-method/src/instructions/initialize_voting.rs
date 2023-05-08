@@ -7,6 +7,7 @@ pub fn initialize_voting(ctx: Context<InitializeVoting>, voting_authority: Pubke
     let voting_info = &mut ctx.accounts.voting_info;
 
     voting_info.voting_authority = voting_authority;
+    voting_info.emergency = false;
     voting_info.bump = *ctx.bumps.get("voting_info").unwrap();
     Ok(())
 }
@@ -18,7 +19,7 @@ pub struct InitializeVoting<'info> {
     #[account(
         init,
         payer = payer,
-        seeds = [BRIDGE_SEED],
+        seeds = [VOTING_INFO_SEED],
         bump,
         space = VotingInfo::LEN,
     )]

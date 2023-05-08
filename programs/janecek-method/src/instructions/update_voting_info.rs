@@ -17,7 +17,7 @@ pub struct UpdateVotingInfo<'info> {
     #[account(
         mut,
         has_one = voting_authority,
-        seeds = [BRIDGE_SEED],
+        seeds = [VOTING_INFO_SEED],
         bump = voting_info.bump,
     )]
     pub voting_info: Account<'info, VotingInfo>,
