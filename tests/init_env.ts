@@ -23,7 +23,7 @@ export async function init_env(test_env: TestEnviroment) {
         test_env.provider.connection,
         test_env.payer,
         test_env.VotingInfo,
-        null,
+        test_env.VotingInfo,
         0
     );
     test_env.token_account = token.getAssociatedTokenAddressSync(test_env.mint, test_env.VotingInfo, true);
@@ -36,6 +36,16 @@ export async function init_env(test_env: TestEnviroment) {
             Buffer.from("metadata"),
             TOKEN_METADATA_PROGRAM_ID.toBuffer(),
             test_env.mint.toBuffer(),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+    );
+
+    [test_env.master_edition_account, test_env.master_edition_account_bump] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from("metadata"),
+            TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+            test_env.mint.toBuffer(),
+            Buffer.from("edition"),
         ],
         TOKEN_METADATA_PROGRAM_ID
     );

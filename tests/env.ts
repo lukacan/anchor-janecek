@@ -23,6 +23,10 @@ export class TestEnviroment {
     metadata_account: anchor.web3.PublicKey;
     metadata_account_bump: number;
 
+    master_edition_account: anchor.web3.PublicKey;
+    master_edition_account_bump: number;
+
+
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
