@@ -1,7 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import { assert } from "chai";
 import { TestEnviroment } from "../env";
-import { SystemProgram } from '@solana/web3.js';
+import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { SolanaError } from "../janecek-method-test";
 import { airdrop } from "../init_env";
 
@@ -10,6 +10,8 @@ import { airdrop } from "../init_env";
 
 export async function InitializeVoting(test_env: TestEnviroment) {
     it(">> 1. Cannot Mismatch Signer", async () => {
+
+
         let tmp_user = anchor.web3.Keypair.generate();
         await airdrop(test_env.provider.connection, tmp_user.publicKey);
 

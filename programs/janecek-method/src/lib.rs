@@ -36,4 +36,7 @@ pub mod janecek_method {
     pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
         instructions::add_party(ctx)
     }
+    pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
+        instructions::mint_nft(ctx)
+    }
 }

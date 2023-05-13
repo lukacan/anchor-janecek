@@ -27,6 +27,18 @@ export class TestEnviroment {
     master_edition_account_bump: number;
 
 
+    new_mint: anchor.web3.PublicKey;
+    new_token_account: anchor.web3.PublicKey;
+
+    new_metadata_account: anchor.web3.PublicKey;
+    new_metadata_account_bump: number;
+
+    new_edition_account: anchor.web3.PublicKey;
+    new_edition_account_bump: number;
+
+    edition_mark: anchor.web3.PublicKey;
+    edition_mark_bump: number;
+
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
