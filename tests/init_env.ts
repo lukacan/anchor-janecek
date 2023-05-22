@@ -4,6 +4,11 @@ import { PublicKey } from '@solana/web3.js';
 import { JanecekMethod } from "../target/types/janecek_method";
 import * as token from '@solana/spl-token';
 
+export const VOTING_INFO_SEED = "janecek-voting-seed";
+export const PARTY_SEED = "janecek-party-seed";
+export const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
 
 export async function init_env(test_env: TestEnviroment) {
     test_env.provider = anchor.AnchorProvider.env();
@@ -14,41 +19,38 @@ export async function init_env(test_env: TestEnviroment) {
     await airdrop(test_env.provider.connection, test_env.VotingAuthority.publicKey);
     await airdrop(test_env.provider.connection, test_env.NewVotingAuthority.publicKey);
     await airdrop(test_env.provider.connection, test_env.PartyCreator.publicKey);
-
-    [test_env.VotingInfo, test_env.VotingBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode("janecek-voting-seed")], test_env.program.programId);
-    [test_env.Party, test_env.PartyBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode("janecek-party-seed"), test_env.VotingInfo.toBuffer()], test_env.program.programId);
-
+    await airdrop(test_env.provider.connection, test_env.PartyCreator.publicKey);
+    await airdrop(test_env.provider.connection, test_env.voter.publicKey);
 
 
+    [test_env.VotingInfo, test_env.VotingBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode(VOTING_INFO_SEED), test_env.VotingAuthority.publicKey.toBuffer()], test_env.program.programId);
+    [test_env.Party, test_env.PartyBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode(PARTY_SEED), test_env.PartyCreator.publicKey.toBuffer(), test_env.VotingInfo.toBuffer()], test_env.program.programId);
 
     test_env.mint = await token.createMint(
         test_env.provider.connection,
-        test_env.VotingAuthority,
-        test_env.VotingAuthority.publicKey,
-        test_env.VotingAuthority.publicKey,
+        test_env.payer,
+        test_env.PartyCreator.publicKey,
+        test_env.PartyCreator.publicKey,
         0
     );
 
-
     test_env.new_mint = await token.createMint(
         test_env.provider.connection,
-        test_env.VotingAuthority,
-        test_env.VotingAuthority.publicKey,
-        test_env.VotingAuthority.publicKey,
+        test_env.payer,
+        test_env.voter.publicKey,
+        test_env.voter.publicKey,
         0,
     );
 
-    test_env.token_account = await token.createAccount(test_env.provider.connection, test_env.payer, test_env.mint, test_env.VotingAuthority.publicKey);
-    await token.mintTo(test_env.provider.connection, test_env.payer, test_env.mint, test_env.token_account, test_env.VotingAuthority, 1);
+    test_env.token_account = await token.createAccount(test_env.provider.connection, test_env.payer, test_env.mint, test_env.PartyCreator.publicKey);
+    await token.mintTo(test_env.provider.connection, test_env.payer, test_env.mint, test_env.token_account, test_env.PartyCreator, 1);
 
-    test_env.new_token_account = await token.createAccount(test_env.provider.connection, test_env.payer, test_env.new_mint, test_env.VotingAuthority.publicKey);
-    await token.mintTo(test_env.provider.connection, test_env.payer, test_env.new_mint, test_env.new_token_account, test_env.VotingAuthority, 1);
+    test_env.new_token_account = await token.createAccount(test_env.provider.connection, test_env.payer, test_env.new_mint, test_env.voter.publicKey);
+    await token.mintTo(test_env.provider.connection, test_env.payer, test_env.new_mint, test_env.new_token_account, test_env.voter, 1);
 
 
-    const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
-        "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-    );
-
+    // find addresses in order to create new NFT, these are only addresses , account creation handles
+    // metaplex, same as checks that addressesa re correct
     [test_env.metadata_account, test_env.metadata_account_bump] = PublicKey.findProgramAddressSync(
         [
             Buffer.from("metadata"),
@@ -68,7 +70,7 @@ export async function init_env(test_env: TestEnviroment) {
         TOKEN_METADATA_PROGRAM_ID
     );
 
-
+    // -----------------------------------------------------------------------------------------------------
     [test_env.new_metadata_account, test_env.new_metadata_account_bump] = PublicKey.findProgramAddressSync(
         [
             Buffer.from("metadata"),
@@ -88,6 +90,7 @@ export async function init_env(test_env: TestEnviroment) {
         TOKEN_METADATA_PROGRAM_ID
     );
 
+    // -----------------------------------------------------------------------------------------------------
     const quotient = Math.floor(1 / 248);
     let as_string = quotient.toString();
 

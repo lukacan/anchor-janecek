@@ -39,11 +39,15 @@ export class TestEnviroment {
     edition_mark: anchor.web3.PublicKey;
     edition_mark_bump: number;
 
+
+    voter: anchor.web3.Keypair;
+
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
         this.NewVotingAuthority = anchor.web3.Keypair.generate();
         this.PartyCreator = anchor.web3.Keypair.generate();
+        this.voter = anchor.web3.Keypair.generate();
 
     }
 }

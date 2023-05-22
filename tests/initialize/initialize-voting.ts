@@ -18,9 +18,9 @@ export async function InitializeVoting(test_env: TestEnviroment) {
         let didNotFail = ""
         try {
             await test_env.program.methods
-                .initializeVoting(test_env.VotingAuthority.publicKey)
+                .initializeVoting()
                 .accounts({
-                    payer: test_env.payer.publicKey,
+                    votingAuthority: test_env.payer.publicKey,
                     votingInfo: test_env.VotingInfo,
                     systemProgram: SystemProgram.programId
                 })
@@ -33,13 +33,13 @@ export async function InitializeVoting(test_env: TestEnviroment) {
 
     it(">> 2. Initializing Voting", async () => {
         await test_env.program.methods
-            .initializeVoting(test_env.VotingAuthority.publicKey)
+            .initializeVoting()
             .accounts({
-                payer: test_env.payer.publicKey,
+                votingAuthority: test_env.VotingAuthority.publicKey,
                 votingInfo: test_env.VotingInfo,
                 systemProgram: SystemProgram.programId
             })
-            .signers([test_env.payer]).rpc();
+            .signers([test_env.VotingAuthority]).rpc();
 
         let votingInfoData = await test_env.program.account.votingInfo.fetch(test_env.VotingInfo);
         assert.strictEqual(votingInfoData.votingAuthority.toString(), test_env.VotingAuthority.publicKey.toString());
@@ -50,13 +50,13 @@ export async function InitializeVoting(test_env: TestEnviroment) {
     it(">> 3. Cannot Re-Initialize", async () => {
         try {
             await test_env.program.methods
-                .initializeVoting(test_env.VotingAuthority.publicKey)
+                .initializeVoting()
                 .accounts({
-                    payer: test_env.payer.publicKey,
+                    votingAuthority: test_env.VotingAuthority.publicKey,
                     votingInfo: test_env.VotingInfo,
                     systemProgram: SystemProgram.programId
                 })
-                .signers([test_env.payer]).rpc();
+                .signers([test_env.VotingAuthority]).rpc();
             assert.fail()
         } catch (error) {
             assert.isTrue(SolanaError.contains(error.logs, "already in use"), error.logs)
