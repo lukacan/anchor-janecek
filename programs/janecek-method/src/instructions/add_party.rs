@@ -8,7 +8,7 @@ use anchor_spl::{
 use mpl_token_metadata::instruction::{
     create_master_edition_v3, create_metadata_accounts_v3, sign_metadata,
 };
-pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
+pub fn add_party(ctx: Context<AddParty>, name: String, symbol: String, uri: String) -> Result<()> {
     // check if in emergency when everywhing halted
     require!(
         !ctx.accounts.voting_info.emergency,
@@ -43,9 +43,9 @@ pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
             ctx.accounts.party_creator.key(),
             ctx.accounts.voting_authority.key(),
             ctx.accounts.party.key(),
-            std::string::ToString::to_string("Andrej"),
-            std::string::ToString::to_string("Symbol"),
-            std::string::ToString::to_string("Uri"),
+            name,
+            symbol,
+            uri,
             Some(creator),
             1,
             true,

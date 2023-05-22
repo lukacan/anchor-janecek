@@ -12,6 +12,9 @@ export class TestEnviroment {
     Party: anchor.web3.PublicKey;
     PartyBump: number;
 
+    Voter: anchor.web3.PublicKey;
+    VoterBump: number;
+
     VotingAuthority: anchor.web3.Keypair;
     NewVotingAuthority: anchor.web3.Keypair;
 

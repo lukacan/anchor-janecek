@@ -6,6 +6,8 @@ import * as token from '@solana/spl-token';
 
 export const VOTING_INFO_SEED = "janecek-voting-seed";
 export const PARTY_SEED = "janecek-party-seed";
+export const VOTER_SEED = "janecek-voter-seed";
+
 export const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
@@ -25,6 +27,7 @@ export async function init_env(test_env: TestEnviroment) {
 
     [test_env.VotingInfo, test_env.VotingBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode(VOTING_INFO_SEED), test_env.VotingAuthority.publicKey.toBuffer()], test_env.program.programId);
     [test_env.Party, test_env.PartyBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode(PARTY_SEED), test_env.PartyCreator.publicKey.toBuffer(), test_env.VotingInfo.toBuffer()], test_env.program.programId);
+    [test_env.Voter, test_env.VoterBump] = PublicKey.findProgramAddressSync([anchor.utils.bytes.utf8.encode(VOTER_SEED), test_env.voter.publicKey.toBuffer(), test_env.VotingInfo.toBuffer()], test_env.program.programId);
 
     test_env.mint = await token.createMint(
         test_env.provider.connection,

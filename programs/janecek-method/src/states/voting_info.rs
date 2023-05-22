@@ -20,6 +20,6 @@ impl VotingInfo {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub enum VotingState {
     Initialized = 0,
-    Registrations = 2,
-    Voting = 1,
+    Registrations = 1,
+    Voting = 2,
 }

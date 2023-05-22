@@ -30,7 +30,7 @@ pub struct UpdatePartyInfo<'info> {
     #[account(
         has_one = party_creator,
         seeds=[PARTY_SEED,party_creator.key().as_ref(),voting_info.key().as_ref()],
-        bump,
+        bump = party.bump,
     )]
     pub party: Account<'info, Party>,
 }

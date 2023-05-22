@@ -10,10 +10,16 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
 
-export async function AddParty(test_env: TestEnviroment) {
+export async function addParty(test_env: TestEnviroment) {
     it(">> 1. Add Party", async () => {
+        const nft_name = "Andrejovo nft";
+        const nft_symbol = "ANDNFT";
+        const nft_uri = "Andrejovo nft uri";
+
+
+
         await test_env.program.methods
-            .addParty()
+            .addParty(nft_name, nft_symbol, nft_uri)
             .accounts({
                 votingAuthority: test_env.VotingAuthority.publicKey,
                 partyCreator: test_env.PartyCreator.publicKey,
@@ -41,9 +47,9 @@ export async function AddParty(test_env: TestEnviroment) {
         // mint and freez set to master edition
         assert.strictEqual(nft.mint.mintAuthorityAddress.toString(), test_env.master_edition_account.toString());
         assert.strictEqual(nft.mint.freezeAuthorityAddress.toString(), test_env.master_edition_account.toString());
-        assert.strictEqual(nft.name, "Andrej");
-        assert.strictEqual(nft.symbol, "Symbol");
-        assert.strictEqual(nft.uri, "Uri");
+        assert.strictEqual(nft.name, nft_name);
+        assert.strictEqual(nft.symbol, nft_symbol);
+        assert.strictEqual(nft.uri, nft_uri);
         assert.strictEqual(nft.isMutable, true);
         assert.strictEqual(nft.primarySaleHappened, false);
         assert.strictEqual(nft.sellerFeeBasisPoints, 1);

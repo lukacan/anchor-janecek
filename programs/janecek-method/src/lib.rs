@@ -35,12 +35,20 @@ pub mod janecek_method {
     pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
         instructions::start_voting(ctx)
     }
-    pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
-        instructions::add_party(ctx)
+    pub fn add_party(
+        ctx: Context<AddParty>,
+        name: String,
+        symbol: String,
+        uri: String,
+    ) -> Result<()> {
+        instructions::add_party(ctx, name, symbol, uri)
     }
-    pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
-        instructions::mint_nft(ctx)
+    pub fn create_voter(ctx: Context<CreateVoter>) -> Result<()> {
+        instructions::create_voter(ctx)
     }
+    // pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
+    //     instructions::mint_nft(ctx)
+    // }
 }
 #[derive(Debug, Clone)]
 pub struct TokenMetaDataProgram;
