@@ -46,6 +46,12 @@ pub mod janecek_method {
     pub fn create_voter(ctx: Context<CreateVoter>) -> Result<()> {
         instructions::create_voter(ctx)
     }
+    pub fn vote_pos(ctx: Context<Vote>) -> Result<()> {
+        instructions::vote_pos(ctx)
+    }
+    pub fn vote_neg(ctx: Context<Vote>) -> Result<()> {
+        instructions::vote_neg(ctx)
+    }
     // pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     //     instructions::mint_nft(ctx)
     // }

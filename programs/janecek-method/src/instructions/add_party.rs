@@ -3,11 +3,12 @@ use crate::{error::VotingError, states::*, TokenMetaDataProgram};
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+    token::{self, mint_to, Mint, Token, TokenAccount},
 };
 use mpl_token_metadata::instruction::{
     create_master_edition_v3, create_metadata_accounts_v3, sign_metadata,
 };
+use solana_program::program::invoke;
 pub fn add_party(ctx: Context<AddParty>, name: String, symbol: String, uri: String) -> Result<()> {
     // check if in emergency when everywhing halted
     require!(
@@ -23,8 +24,20 @@ pub fn add_party(ctx: Context<AddParty>, name: String, symbol: String, uri: Stri
     // creating NFT metadatas
     require!(
         ctx.accounts.voting_info.voting_state == VotingState::Registrations,
-        VotingError::VotingInWrongState
+        VotingError::PartyRegistrationsNotAllowed
     );
+
+    mint_to(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            token::MintTo {
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.party_creator.to_account_info(),
+            },
+        ),
+        1,
+    )?;
 
     let party_bump = *ctx.bumps.get("party").unwrap();
 
@@ -124,6 +137,7 @@ pub fn add_party(ctx: Context<AddParty>, name: String, symbol: String, uri: Stri
     let party = &mut ctx.accounts.party;
 
     party.party_creator = ctx.accounts.party_creator.key();
+    party.voting_info = ctx.accounts.voting_info.key();
 
     let clock: Clock = Clock::get().unwrap();
     party.created = clock.unix_timestamp;
@@ -154,15 +168,18 @@ pub struct AddParty<'info> {
     )]
     pub party: Account<'info, Party>,
     #[account(
-        mut,
+        init,
+        payer = party_creator,
         mint::authority = party_creator,
         mint::freeze_authority = party_creator,
         mint::decimals = 0,
     )]
     pub mint: Account<'info, Mint>,
     #[account(
+        init,
+        payer = party_creator,
         associated_token::mint = mint,
-        associated_token::authority = party_creator,
+        associated_token::authority = party,
     )]
     pub token_account: Account<'info, TokenAccount>,
 

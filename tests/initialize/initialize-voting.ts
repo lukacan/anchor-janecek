@@ -10,8 +10,6 @@ import { airdrop } from "../init_env";
 
 export async function InitializeVoting(test_env: TestEnviroment) {
     it(">> 1. Cannot Mismatch Signer", async () => {
-
-
         let tmp_user = anchor.web3.Keypair.generate();
         await airdrop(test_env.provider.connection, tmp_user.publicKey);
 

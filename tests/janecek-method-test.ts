@@ -1,10 +1,11 @@
 import { TestEnviroment } from "./env";
 import { init_env } from "./init_env";
 import { InitializeVoting } from "./initialize/initialize-voting";
-import { UpdateVotingInfo } from "./update/update_voting_info";
+import { UpdateVotingInfo } from "./Update/update_voting_info";
 import { addParty } from "./Party/add-party";
 import { testNFT } from "./nft/test-nft";
 import { addVoter } from "./Voter/add-voter";
+import { Vote } from "./Vote/vote";
 
 
 describe("Janecek Voting Method", async () => {
@@ -24,6 +25,9 @@ describe("Janecek Voting Method", async () => {
   })
   describe("Add Voter", async () => {
     addVoter(test_env);
+  })
+  describe("Vote", async () => {
+    Vote(test_env);
   })
   // describe("Test NFT", async () => {
   //   testNFT(test_env);

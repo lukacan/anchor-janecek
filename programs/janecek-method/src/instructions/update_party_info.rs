@@ -9,7 +9,7 @@ pub fn change_name(ctx: Context<UpdatePartyInfo>) -> Result<()> {
     );
     require!(
         ctx.accounts.voting_info.voting_state == VotingState::Registrations,
-        VotingError::VotingInWrongState
+        VotingError::PartyRegistrationsNotAllowed
     );
 
     // change name here
@@ -29,6 +29,7 @@ pub struct UpdatePartyInfo<'info> {
     pub voting_info: Account<'info, VotingInfo>,
     #[account(
         has_one = party_creator,
+        has_one = voting_info,
         seeds=[PARTY_SEED,party_creator.key().as_ref(),voting_info.key().as_ref()],
         bump = party.bump,
     )]

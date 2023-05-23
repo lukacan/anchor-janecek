@@ -6,6 +6,7 @@ const DISCRIMINATOR: usize = 8;
 #[account]
 pub struct Voter {
     pub voter_authority: Pubkey,
+    pub voting_info: Pubkey,
     pub num_votes: NumVotes,
     pub pos1: Pubkey,
     pub pos2: Pubkey,
@@ -14,7 +15,7 @@ pub struct Voter {
 }
 
 impl Voter {
-    pub const LEN: usize = DISCRIMINATOR + 32 + 1 + 32 + 32 + 32 + 1;
+    pub const LEN: usize = DISCRIMINATOR + 32 + 32 + 1 + 32 + 32 + 32 + 1;
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum NumVotes {

@@ -13,12 +13,13 @@ pub fn create_voter(ctx: Context<CreateVoter>) -> Result<()> {
     require!(
         ctx.accounts.voting_info.voting_state == VotingState::Registrations
             || ctx.accounts.voting_info.voting_state == VotingState::Voting,
-        VotingError::VotingInWrongState
+        VotingError::VoterRegistrationsNotAllowed
     );
 
     let voter_info = &mut ctx.accounts.voter;
 
     voter_info.voter_authority = ctx.accounts.voter_authority.key();
+    voter_info.voting_info = ctx.accounts.voting_info.key();
     voter_info.num_votes = NumVotes::Three;
     voter_info.bump = *ctx.bumps.get("voter").unwrap();
 

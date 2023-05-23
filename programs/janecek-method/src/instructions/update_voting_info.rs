@@ -19,7 +19,7 @@ pub fn change_default_timestamp(ctx: Context<UpdateVotingInfo>, new_timestamp: i
     require!(!voting_info.emergency, VotingError::VotingInEmergencyMode);
     require!(
         voting_info.voting_state == VotingState::Initialized,
-        VotingError::VotingInWrongState
+        VotingError::NotInitialState
     );
     voting_info.voting_timestamp = new_timestamp;
     Ok(())
@@ -29,7 +29,7 @@ pub fn start_registrations(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     require!(!voting_info.emergency, VotingError::VotingInEmergencyMode);
     require!(
         voting_info.voting_state == VotingState::Initialized,
-        VotingError::VotingInWrongState
+        VotingError::NotInitialState
     );
     voting_info.voting_state = VotingState::Registrations;
 
@@ -38,10 +38,11 @@ pub fn start_registrations(ctx: Context<UpdateVotingInfo>) -> Result<()> {
 
 pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     let voting_info = &mut ctx.accounts.voting_info;
+
     require!(!voting_info.emergency, VotingError::VotingInEmergencyMode);
     require!(
         voting_info.voting_state == VotingState::Registrations,
-        VotingError::VotingInWrongState
+        VotingError::StartRegistrationsFirst
     );
 
     let clock: Clock = Clock::get().unwrap();
@@ -52,7 +53,7 @@ pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
         .checked_add(voting_info.voting_timestamp)
     {
         Some(x) => x,
-        None => return Err(VotingError::VotingInWrongState.into()),
+        None => return Err(VotingError::AdditionOverflow.into()),
     };
 
     voting_info.voting_state = VotingState::Voting;
