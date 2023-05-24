@@ -96,6 +96,7 @@ pub struct Vote<'info> {
     /// CHECK: This may be good but doublecheck
     pub party_creator: AccountInfo<'info>,
     #[account(
+        mut,
         has_one = party_creator,
         has_one = voting_info,
         seeds=[PARTY_SEED,party_creator.key().as_ref(),voting_info.key().as_ref()],
@@ -104,6 +105,7 @@ pub struct Vote<'info> {
     pub party: Account<'info, Party>,
     pub voter_authority: Signer<'info>,
     #[account(
+        mut,
         has_one = voter_authority,
         has_one = voting_info,
         seeds = [VOTER_SEED,voter_authority.key().as_ref(),voting_info.key().as_ref()],

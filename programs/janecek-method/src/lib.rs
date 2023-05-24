@@ -35,16 +35,22 @@ pub mod janecek_method {
     pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
         instructions::start_voting(ctx)
     }
-    pub fn add_party(
-        ctx: Context<AddParty>,
+    pub fn add_party_nft(
+        ctx: Context<AddPartyNFT>,
         name: String,
         symbol: String,
         uri: String,
     ) -> Result<()> {
-        instructions::add_party(ctx, name, symbol, uri)
+        instructions::add_party_nft(ctx, name, symbol, uri)
+    }
+    pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
+        instructions::add_party(ctx)
     }
     pub fn create_voter(ctx: Context<CreateVoter>) -> Result<()> {
         instructions::create_voter(ctx)
+    }
+    pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
+        instructions::vote_pos_nft(ctx)
     }
     pub fn vote_pos(ctx: Context<Vote>) -> Result<()> {
         instructions::vote_pos(ctx)

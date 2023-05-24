@@ -28,4 +28,7 @@ pub enum VotingError {
     NoMoreVotes,
     #[msg("Vote two Positive first")]
     VoteTwoPosFirst,
+
+    #[msg("Cannot Vote and Obtain NFT for Party that does not give away NFTs")]
+    PartyDoesNotProvideNFT,
 }

@@ -26,10 +26,41 @@ export class TestEnviroment {
     anotherParty: anchor.web3.PublicKey;
     anotherPartyBump: number;
 
+    NoNFTPartyCreator: anchor.web3.Keypair;
+    NoNFTParty: anchor.web3.PublicKey;
+    NoNFTPartyBump: number;
+
     // voter
     voter: anchor.web3.Keypair;
     Voter: anchor.web3.PublicKey;
     VoterBump: number;
+
+    // pos1
+    mint_voter1: anchor.web3.Keypair;
+    token_account_voter1: anchor.web3.PublicKey;
+
+    voter_metadata_account1: anchor.web3.PublicKey;
+    voter_metadata_account_bump1: number;
+
+    voter_edition_account1: anchor.web3.PublicKey;
+    voter_edition_account_bump1: number;
+
+    voter_edition_mark1: anchor.web3.PublicKey;
+    voter_edition_mark_bump1: number;
+
+
+    // pos2
+    mint_voter2: anchor.web3.Keypair;
+    token_account_voter2: anchor.web3.PublicKey;
+
+    voter_metadata_account2: anchor.web3.PublicKey;
+    voter_metadata_account_bump2: number;
+
+    voter_edition_account2: anchor.web3.PublicKey;
+    voter_edition_account_bump2: number;
+
+    voter_edition_mark2: anchor.web3.PublicKey;
+    voter_edition_mark_bump2: number;
 
 
     // mints, tokens, metadata , editions,
@@ -53,28 +84,21 @@ export class TestEnviroment {
     another_master_edition_account_bump: number;
 
 
-    new_mint: anchor.web3.PublicKey;
-    new_token_account: anchor.web3.PublicKey;
-
-    new_metadata_account: anchor.web3.PublicKey;
-    new_metadata_account_bump: number;
-
-    new_edition_account: anchor.web3.PublicKey;
-    new_edition_account_bump: number;
-
-    edition_mark: anchor.web3.PublicKey;
-    edition_mark_bump: number;
-
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
         this.NewVotingAuthority = anchor.web3.Keypair.generate();
         this.PartyCreator = anchor.web3.Keypair.generate();
         this.anotherPartyCreator = anchor.web3.Keypair.generate();
+        this.NoNFTPartyCreator = anchor.web3.Keypair.generate();
+
         this.mint = anchor.web3.Keypair.generate();
         this.another_mint = anchor.web3.Keypair.generate();
 
         this.voter = anchor.web3.Keypair.generate();
+        this.mint_voter1 = anchor.web3.Keypair.generate();
+        this.mint_voter2 = anchor.web3.Keypair.generate();
+
 
     }
 }

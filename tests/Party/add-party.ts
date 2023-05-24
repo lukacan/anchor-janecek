@@ -16,26 +16,32 @@ export async function addParty(test_env: TestEnviroment) {
         const nft_symbol = "PRT1NFT";
         const nft_uri = "Party1 nft uri";
 
+        try {
+            await test_env.program.methods
+                .addPartyNft(nft_name, nft_symbol, nft_uri)
+                .accounts({
+                    votingAuthority: test_env.VotingAuthority.publicKey,
+                    partyCreator: test_env.PartyCreator.publicKey,
+                    votingInfo: test_env.VotingInfo,
+                    party: test_env.Party,
+                    mint: test_env.mint.publicKey,
+                    tokenAccount: test_env.token_account,
+                    metadataAccount: test_env.metadata_account,
+                    masterEditionAccount: test_env.master_edition_account,
+                    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
+                    associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
+                    tokenProgram: token.TOKEN_PROGRAM_ID,
+                    rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+                })
+                .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
+        } catch (error) {
+            console.log(error)
+            assert.fail()
+        }
 
 
-        await test_env.program.methods
-            .addParty(nft_name, nft_symbol, nft_uri)
-            .accounts({
-                votingAuthority: test_env.VotingAuthority.publicKey,
-                partyCreator: test_env.PartyCreator.publicKey,
-                votingInfo: test_env.VotingInfo,
-                party: test_env.Party,
-                mint: test_env.mint.publicKey,
-                tokenAccount: test_env.token_account,
-                metadataAccount: test_env.metadata_account,
-                masterEditionAccount: test_env.master_edition_account,
-                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-                systemProgram: SystemProgram.programId,
-                associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
-                tokenProgram: token.TOKEN_PROGRAM_ID,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
+
 
         const metaplex = Metaplex.make(test_env.provider.connection);
 
@@ -61,6 +67,13 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(nft.edition.supply.toString(), new anchor.BN(0).toString());
         assert.strictEqual(nft.edition.maxSupply.toString(), new anchor.BN(10).toString());
 
+        let partyData = await test_env.program.account.party.fetch(test_env.Party);
+
+        assert.strictEqual(partyData.haveNft, true);
+        assert.strictEqual(partyData.votingInfo.toString(), test_env.VotingInfo.toString());
+        assert.strictEqual(partyData.partyCreator.toString(), test_env.PartyCreator.publicKey.toString());
+        assert.strictEqual(partyData.votes.toNumber(), 0);
+
     });
 
 
@@ -71,24 +84,32 @@ export async function addParty(test_env: TestEnviroment) {
 
 
 
-        await test_env.program.methods
-            .addParty(nft_name, nft_symbol, nft_uri)
-            .accounts({
-                votingAuthority: test_env.VotingAuthority.publicKey,
-                partyCreator: test_env.anotherPartyCreator.publicKey,
-                votingInfo: test_env.VotingInfo,
-                party: test_env.anotherParty,
-                mint: test_env.another_mint.publicKey,
-                tokenAccount: test_env.another_token_account,
-                metadataAccount: test_env.another_metadata_account,
-                masterEditionAccount: test_env.another_master_edition_account,
-                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-                systemProgram: SystemProgram.programId,
-                associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
-                tokenProgram: token.TOKEN_PROGRAM_ID,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([test_env.VotingAuthority, test_env.anotherPartyCreator, test_env.another_mint]).rpc();
+        try {
+            await test_env.program.methods
+                .addPartyNft(nft_name, nft_symbol, nft_uri)
+                .accounts({
+                    votingAuthority: test_env.VotingAuthority.publicKey,
+                    partyCreator: test_env.anotherPartyCreator.publicKey,
+                    votingInfo: test_env.VotingInfo,
+                    party: test_env.anotherParty,
+                    mint: test_env.another_mint.publicKey,
+                    tokenAccount: test_env.another_token_account,
+                    metadataAccount: test_env.another_metadata_account,
+                    masterEditionAccount: test_env.another_master_edition_account,
+                    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
+                    associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
+                    tokenProgram: token.TOKEN_PROGRAM_ID,
+                    rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+                })
+                .signers([test_env.VotingAuthority, test_env.anotherPartyCreator, test_env.another_mint]).rpc();
+        } catch (error) {
+            console.log(error)
+            assert.fail()
+        }
+
+
+
 
         const metaplex = Metaplex.make(test_env.provider.connection);
 
@@ -113,5 +134,33 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(nft.edition.isOriginal, true);
         assert.strictEqual(nft.edition.supply.toString(), new anchor.BN(0).toString());
         assert.strictEqual(nft.edition.maxSupply.toString(), new anchor.BN(10).toString());
+
+        let partyData = await test_env.program.account.party.fetch(test_env.anotherParty);
+
+        assert.strictEqual(partyData.haveNft, true);
+        assert.strictEqual(partyData.votingInfo.toString(), test_env.VotingInfo.toString());
+        assert.strictEqual(partyData.partyCreator.toString(), test_env.anotherPartyCreator.publicKey.toString());
+        assert.strictEqual(partyData.votes.toNumber(), 0);
+
+    });
+    it(">> 2. Add Party: Party has no NFT", async () => {
+        await test_env.program.methods
+            .addParty()
+            .accounts({
+                votingAuthority: test_env.VotingAuthority.publicKey,
+                partyCreator: test_env.NoNFTPartyCreator.publicKey,
+                votingInfo: test_env.VotingInfo,
+                party: test_env.NoNFTParty,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([test_env.VotingAuthority, test_env.NoNFTPartyCreator]).rpc();
+
+        let partyData = await test_env.program.account.party.fetch(test_env.NoNFTParty);
+
+        assert.strictEqual(partyData.haveNft, false);
+        assert.strictEqual(partyData.votingInfo.toString(), test_env.VotingInfo.toString());
+        assert.strictEqual(partyData.partyCreator.toString(), test_env.NoNFTPartyCreator.publicKey.toString());
+        assert.strictEqual(partyData.votes.toNumber(), 0);
+
     });
 }
