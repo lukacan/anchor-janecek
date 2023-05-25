@@ -18,7 +18,7 @@ export async function addParty(test_env: TestEnviroment) {
 
         try {
             await test_env.program.methods
-                .addPartyNft(nft_name, nft_symbol, nft_uri)
+                .addPartyNft(nft_name, nft_symbol, nft_uri, null)
                 .accounts({
                     votingAuthority: test_env.VotingAuthority.publicKey,
                     partyCreator: test_env.PartyCreator.publicKey,
@@ -40,9 +40,6 @@ export async function addParty(test_env: TestEnviroment) {
             assert.fail()
         }
 
-
-
-
         const metaplex = Metaplex.make(test_env.provider.connection);
 
         const nft = await metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
@@ -58,14 +55,14 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(nft.uri, nft_uri);
         assert.strictEqual(nft.isMutable, true);
         assert.strictEqual(nft.primarySaleHappened, false);
-        assert.strictEqual(nft.sellerFeeBasisPoints, 1);
+        assert.strictEqual(nft.sellerFeeBasisPoints, 0);
         assert.strictEqual(nft.creators[0].address.toString(), test_env.Party.toString());
         assert.strictEqual(nft.creators[0].verified, true);
         assert.strictEqual(nft.creators[0].share, 100);
         assert.strictEqual(nft.address.toString(), test_env.mint.publicKey.toString());
         assert.strictEqual(nft.edition.isOriginal, true);
         assert.strictEqual(nft.edition.supply.toString(), new anchor.BN(0).toString());
-        assert.strictEqual(nft.edition.maxSupply.toString(), new anchor.BN(10).toString());
+        assert.strictEqual(nft.edition.maxSupply, null);
 
         let partyData = await test_env.program.account.party.fetch(test_env.Party);
 
@@ -83,10 +80,10 @@ export async function addParty(test_env: TestEnviroment) {
         const nft_uri = "Party2 nft uri";
 
 
-
+        const max_supply = 500;
         try {
             await test_env.program.methods
-                .addPartyNft(nft_name, nft_symbol, nft_uri)
+                .addPartyNft(nft_name, nft_symbol, nft_uri, new anchor.BN(500))
                 .accounts({
                     votingAuthority: test_env.VotingAuthority.publicKey,
                     partyCreator: test_env.anotherPartyCreator.publicKey,
@@ -115,6 +112,7 @@ export async function addParty(test_env: TestEnviroment) {
 
         const nft = await metaplex.nfts().findByMint({ mintAddress: test_env.another_mint.publicKey });
 
+        //console.log(nft);
         // update set to party
         assert.strictEqual(nft.updateAuthorityAddress.toString(), test_env.anotherParty.toString());
         assert.strictEqual(nft.mint.address.toString(), test_env.another_mint.publicKey.toString());
@@ -126,14 +124,14 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(nft.uri, nft_uri);
         assert.strictEqual(nft.isMutable, true);
         assert.strictEqual(nft.primarySaleHappened, false);
-        assert.strictEqual(nft.sellerFeeBasisPoints, 1);
+        assert.strictEqual(nft.sellerFeeBasisPoints, 0);
         assert.strictEqual(nft.creators[0].address.toString(), test_env.anotherParty.toString());
         assert.strictEqual(nft.creators[0].verified, true);
         assert.strictEqual(nft.creators[0].share, 100);
         assert.strictEqual(nft.address.toString(), test_env.another_mint.publicKey.toString());
         assert.strictEqual(nft.edition.isOriginal, true);
         assert.strictEqual(nft.edition.supply.toString(), new anchor.BN(0).toString());
-        assert.strictEqual(nft.edition.maxSupply.toString(), new anchor.BN(10).toString());
+        assert.strictEqual(nft.edition.maxSupply.toNumber(), max_supply);
 
         let partyData = await test_env.program.account.party.fetch(test_env.anotherParty);
 

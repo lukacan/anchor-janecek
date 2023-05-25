@@ -40,8 +40,9 @@ pub mod janecek_method {
         name: String,
         symbol: String,
         uri: String,
+        max_supply: Option<u64>,
     ) -> Result<()> {
-        instructions::add_party_nft(ctx, name, symbol, uri)
+        instructions::add_party_nft(ctx, name, symbol, uri, max_supply)
     }
     pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
         instructions::add_party(ctx)
@@ -58,9 +59,15 @@ pub mod janecek_method {
     pub fn vote_neg(ctx: Context<Vote>) -> Result<()> {
         instructions::vote_neg(ctx)
     }
-    // pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
-    //     instructions::mint_nft(ctx)
-    // }
+    pub fn change_nft_data(
+        ctx: Context<UpdatePartyInfo>,
+        input_name: String,
+        input_symbol: String,
+        input_uri: String,
+        is_mutable: bool,
+    ) -> Result<()> {
+        instructions::change_nft_data(ctx, input_name, input_symbol, input_uri, is_mutable)
+    }
 }
 #[derive(Debug, Clone)]
 pub struct TokenMetaDataProgram;

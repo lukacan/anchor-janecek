@@ -69,14 +69,14 @@ export async function init_env(test_env: TestEnviroment) {
     // voter edition 1
     test_env.voter_edition_account1 = metaplex.nfts().pdas().edition({ mint: test_env.mint_voter1.publicKey });
     // voter edition mark 1
-    test_env.voter_edition_mark1 = metaplex.nfts().pdas().editionMarker({ mint: test_env.mint_voter1.publicKey, edition: toBigNumber(1) });
+    test_env.voter_edition_mark1 = metaplex.nfts().pdas().editionMarker({ mint: test_env.mint.publicKey, edition: toBigNumber(1) });
 
 
     // voter metadata 2
     test_env.voter_metadata_account2 = metaplex.nfts().pdas().metadata({ mint: test_env.mint_voter2.publicKey });
-    // voter edition 1
+    // voter edition 2
     test_env.voter_edition_account2 = metaplex.nfts().pdas().edition({ mint: test_env.mint_voter2.publicKey });
-    // voter edition mark 1
+    // voter edition mark 2
     test_env.voter_edition_mark2 = metaplex.nfts().pdas().editionMarker({ mint: test_env.mint_voter2.publicKey, edition: toBigNumber(1) });
 
     // -----------------------------------------------------------------------------------------------------

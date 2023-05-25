@@ -22,9 +22,9 @@ pub struct InitializeVoting<'info> {
     #[account(
         init,
         payer = voting_authority,
+        space = VotingInfo::LEN,
         seeds = [VOTING_INFO_SEED,voting_authority.key().as_ref()],
         bump,
-        space = VotingInfo::LEN,
     )]
     pub voting_info: Account<'info, VotingInfo>,
     pub system_program: Program<'info, System>,

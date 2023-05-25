@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{self, mint_to, Mint, Token, TokenAccount},
 };
 use mpl_token_metadata::instruction::mint_new_edition_from_master_edition_via_token;
-use solana_program::program::invoke;
+use solana_program::program::invoke_signed;
 
 use crate::{
     error::VotingError,
@@ -34,7 +34,7 @@ pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
     match voter.num_votes {
         NumVotes::Three => {
             let party = &mut ctx.accounts.party;
-
+            let party_bump = party.bump;
             party.votes = match party.votes.checked_add(1) {
                 Some(value) => value,
                 None => return Err(VotingError::AdditionOverflow.into()),
@@ -49,45 +49,53 @@ pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
                     token::MintTo {
                         mint: ctx.accounts.voter_mint.to_account_info(),
                         to: ctx.accounts.voter_token_account.to_account_info(),
-                        authority: ctx.accounts.party_creator.to_account_info(),
+                        authority: ctx.accounts.voter_authority.to_account_info(),
                     },
                 ),
                 1,
             )?;
 
-            // invoke(
-            //     &mint_new_edition_from_master_edition_via_token(
-            //         ctx.accounts.token_metadata_program.key(),
-            //         ctx.accounts.new_metadata_account.key(),
-            //         ctx.accounts.new_edition_account.key(),
-            //         ctx.accounts.master_edition_account.key(),
-            //         ctx.accounts.new_mint.key(),
-            //         ctx.accounts.voting_authority.key(),
-            //         ctx.accounts.party_creator.key(),
-            //         ctx.accounts.voting_authority.key(),
-            //         ctx.accounts.token_account.key(),
-            //         ctx.accounts.voting_authority.key(),
-            //         ctx.accounts.metadata_account.key(),
-            //         ctx.accounts.mint.key(),
-            //         1,
-            //     ),
-            //     &[
-            //         ctx.accounts.new_metadata_account.to_account_info(),
-            //         ctx.accounts.new_edition_account.to_account_info(),
-            //         ctx.accounts.master_edition_account.to_account_info(),
-            //         ctx.accounts.new_mint.to_account_info(),
-            //         ctx.accounts.edition_mark_pda.to_account_info(),
-            //         ctx.accounts.voting_authority.to_account_info(),
-            //         ctx.accounts.party_creator.to_account_info(),
-            //         ctx.accounts.voting_authority.to_account_info(),
-            //         ctx.accounts.token_account.to_account_info(),
-            //         ctx.accounts.voting_authority.to_account_info(),
-            //         ctx.accounts.metadata_account.to_account_info(),
-            //         ctx.accounts.token_program.to_account_info(),
-            //         ctx.accounts.system_program.to_account_info(),
-            //         ctx.accounts.rent.to_account_info(),
-            //     ],
-            // )?;
+            //msg!("{}",ctx.)
+
+            invoke_signed(
+                &mint_new_edition_from_master_edition_via_token(
+                    ctx.accounts.token_metadata_program.key(),
+                    ctx.accounts.voter_metadata_account.key(),
+                    ctx.accounts.voter_edition_account.key(),
+                    ctx.accounts.master_edition.key(),
+                    ctx.accounts.voter_mint.key(),
+                    ctx.accounts.voter_authority.key(),
+                    ctx.accounts.voter_authority.key(),
+                    ctx.accounts.party.key(),
+                    ctx.accounts.master_token.key(),
+                    ctx.accounts.party.key(),
+                    ctx.accounts.master_metadata.key(),
+                    ctx.accounts.master_mint.key(),
+                    1,
+                ),
+                &[
+                    ctx.accounts.voter_metadata_account.to_account_info(),
+                    ctx.accounts.voter_edition_account.to_account_info(),
+                    ctx.accounts.master_edition.to_account_info(),
+                    ctx.accounts.voter_mint.to_account_info(),
+                    ctx.accounts.voter_edition_mark.to_account_info(),
+                    ctx.accounts.voter_authority.to_account_info(),
+                    ctx.accounts.voter_authority.to_account_info(),
+                    ctx.accounts.party.to_account_info(),
+                    ctx.accounts.master_token.to_account_info(),
+                    ctx.accounts.party.to_account_info(),
+                    ctx.accounts.master_metadata.to_account_info(),
+                    ctx.accounts.token_program.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                    ctx.accounts.rent.to_account_info(),
+                ],
+                &[&[
+                    PARTY_SEED,
+                    ctx.accounts.party_creator.key().as_ref(),
+                    ctx.accounts.voting_info.key().as_ref(),
+                    &[party_bump],
+                ]],
+            )?;
 
             Ok(())
         }
@@ -126,6 +134,10 @@ pub struct VoteNFT<'info> {
         mut,
         has_one = party_creator,
         has_one = voting_info,
+        has_one = master_mint,
+        has_one = master_token,
+        has_one = master_metadata,
+        has_one = master_edition,
         seeds=[PARTY_SEED,party_creator.key().as_ref(),voting_info.key().as_ref()],
         bump = party.bump,
     )]
@@ -147,14 +159,14 @@ pub struct VoteNFT<'info> {
         mint::freeze_authority = voter_authority,
         mint::decimals = 0,
     )]
-    pub voter_mint: Account<'info, Mint>,
+    pub voter_mint: Box<Account<'info, Mint>>,
     #[account(
         init,
         payer = voter_authority,
         associated_token::mint = voter_mint,
         associated_token::authority = voter_authority,
     )]
-    pub voter_token_account: Account<'info, TokenAccount>,
+    pub voter_token_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: We are about to create this and Metaplex will check if address is correct
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/dfd95f7b67d5621d7303e2cb4b678e86904f98a7/token-metadata/program/src/utils/master_edition.rs#L401
@@ -167,15 +179,33 @@ pub struct VoteNFT<'info> {
     #[account(mut)]
     pub voter_edition_account: AccountInfo<'info>,
 
+    /// CHECK: We are about to create this and Metaplex will check if address is correct
+    /// https://github.com/metaplex-foundation/metaplex-program-library/blob/dfd95f7b67d5621d7303e2cb4b678e86904f98a7/token-metadata/program/src/utils/master_edition.rs#LL102C16-L102C33
+    #[account(mut)]
+    pub voter_edition_mark: AccountInfo<'info>,
+
+    #[account(
+        mint::authority = master_edition,
+        mint::freeze_authority = master_edition,
+        mint::decimals = 0,
+    )]
+    pub master_mint: Box<Account<'info, Mint>>,
+
+    #[account(
+        associated_token::mint = master_mint,
+        associated_token::authority = party,
+    )]
+    pub master_token: Box<Account<'info, TokenAccount>>,
+
     /// CHECK: We are not creating , but metaplex check correctness -- consider addint these few pubkeys to party acc, and compare with em, mint, token , metadata, master
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/utils/metadata.rs#LL102C38-L102C51
     #[account(mut)]
-    pub metadata_account: AccountInfo<'info>,
+    pub master_metadata: AccountInfo<'info>,
 
     /// CHECK: We are not creating , but metaplex check correctness
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/processor/edition/create_master_edition_v3.rs#L43
     #[account(mut)]
-    pub master_edition_account: AccountInfo<'info>,
+    pub master_edition: AccountInfo<'info>,
 
     pub token_metadata_program: Program<'info, TokenMetaDataProgram>,
     pub system_program: Program<'info, System>,

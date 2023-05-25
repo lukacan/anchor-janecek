@@ -36,6 +36,8 @@ pub fn start_registrations(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     Ok(())
 }
 
+// TODO create function that will set isMutable to False on all parties
+// this has to be done on frontend because of sealevel
 pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     let voting_info = &mut ctx.accounts.voting_info;
 

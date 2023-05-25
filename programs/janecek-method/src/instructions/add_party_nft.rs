@@ -13,6 +13,7 @@ pub fn add_party_nft(
     name: String,
     symbol: String,
     uri: String,
+    max_supply: Option<u64>,
 ) -> Result<()> {
     // check if in emergency when everywhing halted
     require!(
@@ -64,7 +65,7 @@ pub fn add_party_nft(
             symbol,
             uri,
             Some(creator),
-            1,
+            0,
             true,
             true,
             None,
@@ -117,7 +118,7 @@ pub fn add_party_nft(
             ctx.accounts.party_creator.key(),
             ctx.accounts.metadata_account.key(),
             ctx.accounts.voting_authority.key(),
-            Some(10),
+            max_supply,
         ),
         &[
             ctx.accounts.master_edition_account.to_account_info(),
@@ -143,6 +144,10 @@ pub fn add_party_nft(
     party.party_creator = ctx.accounts.party_creator.key();
     party.voting_info = ctx.accounts.voting_info.key();
     party.have_nft = true;
+    party.master_mint = ctx.accounts.mint.key();
+    party.master_token = ctx.accounts.token_account.key();
+    party.master_metadata = ctx.accounts.metadata_account.key();
+    party.master_edition = ctx.accounts.master_edition_account.key();
 
     let clock: Clock = Clock::get().unwrap();
     party.created = clock.unix_timestamp;
@@ -172,6 +177,8 @@ pub struct AddPartyNFT<'info> {
         bump,
     )]
     pub party: Account<'info, Party>,
+    // Iam not sure if I generate keypair ofchain, maybe we can trasnfer lamports out of it
+    // and so delete mint
     #[account(
         init,
         payer = party_creator,

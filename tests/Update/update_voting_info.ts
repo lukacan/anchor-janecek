@@ -65,7 +65,7 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
 
 
                 await test_env.program.methods
-                    .addPartyNft(nft_name, nft_symbol, nft_uri)
+                    .addPartyNft(nft_name, nft_symbol, nft_uri, null)
                     .accounts({
                         votingAuthority: test_env.VotingAuthority.publicKey,
                         partyCreator: test_env.PartyCreator.publicKey,
@@ -138,7 +138,7 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
 
 
                 await test_env.program.methods
-                    .addPartyNft(nft_name, nft_symbol, nft_uri)
+                    .addPartyNft(nft_name, nft_symbol, nft_uri, new anchor.BN(58416))
                     .accounts({
                         votingAuthority: test_env.VotingAuthority.publicKey,
                         partyCreator: test_env.PartyCreator.publicKey,
