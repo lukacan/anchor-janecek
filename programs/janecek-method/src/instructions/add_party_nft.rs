@@ -177,8 +177,9 @@ pub struct AddPartyNFT<'info> {
         bump,
     )]
     pub party: Account<'info, Party>,
-    // Iam not sure if I generate keypair ofchain, maybe we can trasnfer lamports out of it
-    // and so delete mint
+    // TODO This is OK
+    // Only owner can change data, so that lamports cannot be changed as we do not own this
+    // SPL trasnfer is also not possible
     #[account(
         init,
         payer = party_creator,

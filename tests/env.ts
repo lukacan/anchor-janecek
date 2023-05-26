@@ -1,5 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import { JanecekMethod } from "../target/types/janecek_method";
+import { Metaplex } from "@metaplex-foundation/js";
 
 export class TestEnviroment {
     [x: string]: any;
@@ -17,7 +18,7 @@ export class TestEnviroment {
     NewVotingAuthority: anchor.web3.Keypair;
 
 
-    // party
+    // parties
     PartyCreator: anchor.web3.Keypair;
     Party: anchor.web3.PublicKey;
     PartyBump: number;
@@ -31,7 +32,7 @@ export class TestEnviroment {
     NoNFTPartyBump: number;
 
     // voter
-    voter: anchor.web3.Keypair;
+    VoterCreator: anchor.web3.Keypair;
     Voter: anchor.web3.PublicKey;
     VoterBump: number;
 
@@ -83,6 +84,8 @@ export class TestEnviroment {
     another_master_edition_account: anchor.web3.PublicKey;
     another_master_edition_account_bump: number;
 
+    metaplex: Metaplex;
+
 
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
@@ -95,7 +98,7 @@ export class TestEnviroment {
         this.mint = anchor.web3.Keypair.generate();
         this.another_mint = anchor.web3.Keypair.generate();
 
-        this.voter = anchor.web3.Keypair.generate();
+        this.VoterCreator = anchor.web3.Keypair.generate();
         this.mint_voter1 = anchor.web3.Keypair.generate();
         this.mint_voter2 = anchor.web3.Keypair.generate();
 

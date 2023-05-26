@@ -49,9 +49,9 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                 await test_env.program.methods.createVoter().accounts({
                     votingAuthority: test_env.VotingAuthority.publicKey,
                     votingInfo: test_env.VotingInfo,
-                    voterAuthority: test_env.voter.publicKey,
+                    voterAuthority: test_env.VoterCreator.publicKey,
                     voter: test_env.Voter,
-                }).signers([test_env.voter]).rpc();
+                }).signers([test_env.VoterCreator]).rpc();
                 assert.fail();
             } catch (error) {
                 const err = anchor.AnchorError.parse(error.logs);
@@ -122,9 +122,9 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                 await test_env.program.methods.createVoter().accounts({
                     votingAuthority: test_env.VotingAuthority.publicKey,
                     votingInfo: test_env.VotingInfo,
-                    voterAuthority: test_env.voter.publicKey,
+                    voterAuthority: test_env.VoterCreator.publicKey,
                     voter: test_env.Voter,
-                }).signers([test_env.voter]).rpc();
+                }).signers([test_env.VoterCreator]).rpc();
                 assert.fail();
             } catch (error) {
                 const err = anchor.AnchorError.parse(error.logs);

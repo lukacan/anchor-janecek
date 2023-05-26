@@ -40,9 +40,8 @@ export async function addParty(test_env: TestEnviroment) {
             assert.fail()
         }
 
-        const metaplex = Metaplex.make(test_env.provider.connection);
 
-        const nft = await metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
+        const nft = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
 
         // update set to party
         assert.strictEqual(nft.updateAuthorityAddress.toString(), test_env.Party.toString());
@@ -105,12 +104,7 @@ export async function addParty(test_env: TestEnviroment) {
             assert.fail()
         }
 
-
-
-
-        const metaplex = Metaplex.make(test_env.provider.connection);
-
-        const nft = await metaplex.nfts().findByMint({ mintAddress: test_env.another_mint.publicKey });
+        const nft = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.another_mint.publicKey });
 
         //console.log(nft);
         // update set to party

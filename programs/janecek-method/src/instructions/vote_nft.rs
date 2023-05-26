@@ -55,8 +55,6 @@ pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
                 1,
             )?;
 
-            //msg!("{}",ctx.)
-
             invoke_signed(
                 &mint_new_edition_from_master_edition_via_token(
                     ctx.accounts.token_metadata_program.key(),
@@ -101,6 +99,8 @@ pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
         }
         NumVotes::Two => {
             let party = &mut ctx.accounts.party;
+            let party_bump = party.bump;
+
             require!(voter.pos1 != party.key(), VotingError::NoBothPositiveToSame);
 
             party.votes = match party.votes.checked_add(1) {
@@ -110,6 +110,58 @@ pub fn vote_pos_nft(ctx: Context<VoteNFT>) -> Result<()> {
 
             voter.pos2 = party.key();
             voter.num_votes = NumVotes::One;
+
+            mint_to(
+                CpiContext::new(
+                    ctx.accounts.token_program.to_account_info(),
+                    token::MintTo {
+                        mint: ctx.accounts.voter_mint.to_account_info(),
+                        to: ctx.accounts.voter_token_account.to_account_info(),
+                        authority: ctx.accounts.voter_authority.to_account_info(),
+                    },
+                ),
+                1,
+            )?;
+
+            invoke_signed(
+                &mint_new_edition_from_master_edition_via_token(
+                    ctx.accounts.token_metadata_program.key(),
+                    ctx.accounts.voter_metadata_account.key(),
+                    ctx.accounts.voter_edition_account.key(),
+                    ctx.accounts.master_edition.key(),
+                    ctx.accounts.voter_mint.key(),
+                    ctx.accounts.voter_authority.key(),
+                    ctx.accounts.voter_authority.key(),
+                    ctx.accounts.party.key(),
+                    ctx.accounts.master_token.key(),
+                    ctx.accounts.party.key(),
+                    ctx.accounts.master_metadata.key(),
+                    ctx.accounts.master_mint.key(),
+                    1,
+                ),
+                &[
+                    ctx.accounts.voter_metadata_account.to_account_info(),
+                    ctx.accounts.voter_edition_account.to_account_info(),
+                    ctx.accounts.master_edition.to_account_info(),
+                    ctx.accounts.voter_mint.to_account_info(),
+                    ctx.accounts.voter_edition_mark.to_account_info(),
+                    ctx.accounts.voter_authority.to_account_info(),
+                    ctx.accounts.voter_authority.to_account_info(),
+                    ctx.accounts.party.to_account_info(),
+                    ctx.accounts.master_token.to_account_info(),
+                    ctx.accounts.party.to_account_info(),
+                    ctx.accounts.master_metadata.to_account_info(),
+                    ctx.accounts.token_program.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                    ctx.accounts.rent.to_account_info(),
+                ],
+                &[&[
+                    PARTY_SEED,
+                    ctx.accounts.party_creator.key().as_ref(),
+                    ctx.accounts.voting_info.key().as_ref(),
+                    &[party_bump],
+                ]],
+            )?;
 
             Ok(())
         }

@@ -26,9 +26,9 @@ export async function Vote(test_env: TestEnviroment) {
                 votingInfo: test_env.VotingInfo,
                 partyCreator: test_env.PartyCreator.publicKey,
                 party: test_env.Party,
-                voterAuthority: test_env.voter.publicKey,
+                voterAuthority: test_env.VoterCreator.publicKey,
                 voter: test_env.Voter,
-            }).signers([test_env.voter]).rpc();
+            }).signers([test_env.VoterCreator]).rpc();
         } catch (error) {
             const err = anchor.AnchorError.parse(error.logs);
             assert.strictEqual(err.error.errorCode.code, "VoteTwoPosFirst");
@@ -47,7 +47,7 @@ export async function Vote(test_env: TestEnviroment) {
             votingInfo: test_env.VotingInfo,
             partyCreator: onChainPartyData.partyCreator,
             party: test_env.Party,
-            voterAuthority: test_env.voter.publicKey,
+            voterAuthority: test_env.VoterCreator.publicKey,
             voter: test_env.Voter,
             voterMint: test_env.mint_voter1.publicKey,
             voterTokenAccount: test_env.token_account_voter1,
@@ -63,7 +63,7 @@ export async function Vote(test_env: TestEnviroment) {
             associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
             tokenProgram: token.TOKEN_PROGRAM_ID,
             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        }).signers([test_env.voter, test_env.mint_voter1]).rpc();
+        }).signers([test_env.VoterCreator, test_env.mint_voter1]).rpc();
 
         const partyData = await test_env.program.account.party.fetch(test_env.Party);
         assert.strictEqual(partyData.votes.toNumber(), 1);
@@ -78,8 +78,7 @@ export async function Vote(test_env: TestEnviroment) {
         const nft_uri = "Party1 nft uri";
 
 
-        const metaplex = Metaplex.make(test_env.provider.connection);
-        const voter_nft1 = await metaplex.nfts().findByMint({ mintAddress: test_env.mint_voter1.publicKey });
+        const voter_nft1 = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint_voter1.publicKey });
         assert.strictEqual(voter_nft1.updateAuthorityAddress.toString(), test_env.Party.toString());
         assert.strictEqual(voter_nft1.mint.address.toString(), test_env.mint_voter1.publicKey.toString());
         assert.strictEqual(voter_nft1.name, nft_name);
@@ -115,9 +114,9 @@ export async function Vote(test_env: TestEnviroment) {
                 votingInfo: test_env.VotingInfo,
                 partyCreator: test_env.PartyCreator.publicKey,
                 party: test_env.Party,
-                voterAuthority: test_env.voter.publicKey,
+                voterAuthority: test_env.VoterCreator.publicKey,
                 voter: test_env.Voter,
-            }).signers([test_env.voter]).rpc();
+            }).signers([test_env.VoterCreator]).rpc();
         } catch (error) {
             const err = anchor.AnchorError.parse(error.logs);
             assert.strictEqual(err.error.errorCode.code, "VoteTwoPosFirst");
@@ -139,7 +138,7 @@ export async function Vote(test_env: TestEnviroment) {
                 votingInfo: test_env.VotingInfo,
                 partyCreator: onChainPartyData.partyCreator,
                 party: test_env.NoNFTParty,
-                voterAuthority: test_env.voter.publicKey,
+                voterAuthority: test_env.VoterCreator.publicKey,
                 voter: test_env.Voter,
                 voterMint: test_env.mint_voter2.publicKey,
                 voterTokenAccount: test_env.token_account_voter2,
@@ -155,7 +154,7 @@ export async function Vote(test_env: TestEnviroment) {
                 associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
                 tokenProgram: token.TOKEN_PROGRAM_ID,
                 rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            }).signers([test_env.voter, test_env.mint_voter2]).rpc();
+            }).signers([test_env.VoterCreator, test_env.mint_voter2]).rpc();
             assert.fail()
         } catch (error) {
             const err = anchor.AnchorError.parse(error.logs);
@@ -172,9 +171,9 @@ export async function Vote(test_env: TestEnviroment) {
             votingInfo: test_env.VotingInfo,
             partyCreator: test_env.NoNFTPartyCreator.publicKey,
             party: test_env.NoNFTParty,
-            voterAuthority: test_env.voter.publicKey,
+            voterAuthority: test_env.VoterCreator.publicKey,
             voter: test_env.Voter,
-        }).signers([test_env.voter]).rpc();
+        }).signers([test_env.VoterCreator]).rpc();
 
         const partyData = await test_env.program.account.party.fetch(test_env.NoNFTParty);
         assert.strictEqual(partyData.votes.toNumber(), 1);
@@ -193,7 +192,7 @@ export async function Vote(test_env: TestEnviroment) {
                 votingInfo: test_env.VotingInfo,
                 partyCreator: onChainPartyData.partyCreator,
                 party: test_env.anotherParty,
-                voterAuthority: test_env.voter.publicKey,
+                voterAuthority: test_env.VoterCreator.publicKey,
                 voter: test_env.Voter,
                 voterMint: test_env.mint_voter2.publicKey,
                 voterTokenAccount: test_env.token_account_voter2,
@@ -209,7 +208,7 @@ export async function Vote(test_env: TestEnviroment) {
                 associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
                 tokenProgram: token.TOKEN_PROGRAM_ID,
                 rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            }).signers([test_env.voter, test_env.mint_voter2]).rpc();
+            }).signers([test_env.VoterCreator, test_env.mint_voter2]).rpc();
         } catch (error) {
             const err = anchor.AnchorError.parse(error.logs);
             assert.strictEqual(err.error.errorCode.code, "NoMorePosVotes");
@@ -226,9 +225,9 @@ export async function Vote(test_env: TestEnviroment) {
             votingInfo: test_env.VotingInfo,
             partyCreator: test_env.anotherPartyCreator.publicKey,
             party: test_env.anotherParty,
-            voterAuthority: test_env.voter.publicKey,
+            voterAuthority: test_env.VoterCreator.publicKey,
             voter: test_env.Voter,
-        }).signers([test_env.voter]).rpc();
+        }).signers([test_env.VoterCreator]).rpc();
 
         const partyData = await test_env.program.account.party.fetch(test_env.anotherParty);
         assert.strictEqual(partyData.votes.toNumber(), -1);
@@ -245,9 +244,9 @@ export async function Vote(test_env: TestEnviroment) {
                 votingInfo: test_env.VotingInfo,
                 partyCreator: test_env.anotherPartyCreator.publicKey,
                 party: test_env.anotherParty,
-                voterAuthority: test_env.voter.publicKey,
+                voterAuthority: test_env.VoterCreator.publicKey,
                 voter: test_env.Voter,
-            }).signers([test_env.voter]).rpc();
+            }).signers([test_env.VoterCreator]).rpc();
         } catch (error) {
             const err = anchor.AnchorError.parse(error.logs);
             assert.strictEqual(err.error.errorCode.code, "NoMoreVotes");

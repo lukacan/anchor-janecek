@@ -11,9 +11,8 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 
 export async function updateNFTInfo(test_env: TestEnviroment) {
     it(">>> 1. Test if we can update NFT info for Party1", async () => {
-        const metaplex = Metaplex.make(test_env.provider.connection);
 
-        const nft_before = await metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
+        const nft_before = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
 
         const new_nft_name = "new Party1 NFT";
 
@@ -27,7 +26,7 @@ export async function updateNFTInfo(test_env: TestEnviroment) {
         }).signers([test_env.PartyCreator]).rpc();
 
 
-        const nft_after = await metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
+        const nft_after = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
 
         // update set to party
         assert.strictEqual(nft_after.updateAuthorityAddress.toString(), test_env.Party.toString());

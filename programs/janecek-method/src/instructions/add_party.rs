@@ -3,18 +3,10 @@ use crate::{error::VotingError, states::*};
 use anchor_lang::prelude::*;
 
 pub fn add_party(ctx: Context<AddParty>) -> Result<()> {
-    // check if in emergency when everywhing halted
     require!(
         !ctx.accounts.voting_info.emergency,
         VotingError::VotingInEmergencyMode
     );
-
-    // parties can be added only in initial state, so it`s up to voting authority
-    // to decide when start voting
-    // we can argue that people can create parties, pay for everything and then voting
-    // will not start, and people will lose money basically. In order to prevent this,
-    // voting authority have to sign party creation, and will pay for
-    // creating NFT metadatas
     require!(
         ctx.accounts.voting_info.voting_state == VotingState::Registrations,
         VotingError::PartyRegistrationsNotAllowed
