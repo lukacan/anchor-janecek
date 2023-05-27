@@ -10,7 +10,7 @@ pub struct Party {
     pub voting_info: Pubkey,
     pub have_nft: bool,
     pub master_mint: Pubkey,
-    pub master_token: Pubkey,
+    pub master_token_record: Pubkey,
     pub master_metadata: Pubkey,
     pub master_edition: Pubkey,
     pub votes: i64,

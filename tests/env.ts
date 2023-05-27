@@ -64,7 +64,7 @@ export class TestEnviroment {
     voter_edition_mark_bump2: number;
 
 
-    // mints, tokens, metadata , editions,
+    // mints, tokens, metadata , editions, , token records
     mint: anchor.web3.Keypair;
     token_account: anchor.web3.PublicKey;
 
@@ -73,6 +73,8 @@ export class TestEnviroment {
 
     master_edition_account: anchor.web3.PublicKey;
     master_edition_account_bump: number;
+
+    master_token_record: anchor.web3.PublicKey;
 
 
     another_mint: anchor.web3.Keypair;

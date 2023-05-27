@@ -72,7 +72,8 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                         votingInfo: test_env.VotingInfo,
                         party: test_env.Party,
                         mint: test_env.mint.publicKey,
-                        tokenAccount: test_env.token_account,
+                        masterTokenAccount: test_env.token_account,
+                        masterTokenRecord: test_env.master_token_record,
                         metadataAccount: test_env.metadata_account,
                         masterEditionAccount: test_env.master_edition_account,
                         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
@@ -80,6 +81,7 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                         associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
                         tokenProgram: token.TOKEN_PROGRAM_ID,
                         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+                        instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
                     })
                     .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
             } catch (error) {
@@ -145,7 +147,8 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                         votingInfo: test_env.VotingInfo,
                         party: test_env.Party,
                         mint: test_env.mint.publicKey,
-                        tokenAccount: test_env.token_account,
+                        masterTokenAccount: test_env.token_account,
+                        masterTokenRecord: test_env.master_token_record,
                         metadataAccount: test_env.metadata_account,
                         masterEditionAccount: test_env.master_edition_account,
                         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
@@ -153,6 +156,7 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                         associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
                         tokenProgram: token.TOKEN_PROGRAM_ID,
                         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+                        instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
                     })
                     .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
             } catch (error) {

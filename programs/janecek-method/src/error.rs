@@ -31,4 +31,7 @@ pub enum VotingError {
 
     #[msg("Cannot Vote and Obtain NFT for Party that does not give away NFTs")]
     PartyDoesNotProvideNFT,
+
+    #[msg("Provided account Sysvar Instructions has mismatched ID")]
+    SysvarInstructionsMismatch,
 }

@@ -3,24 +3,30 @@ use crate::{error::VotingError, states::*, TokenMetaDataProgram};
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self, mint_to, Mint, Token, TokenAccount},
+    token::{Mint, Token, TokenAccount},
 };
-use mpl_token_metadata::instruction::{
-    create_master_edition_v3, create_metadata_accounts_v3, sign_metadata,
+
+use mpl_token_metadata::{
+    instruction::{
+        builders::{CreateBuilder, MintBuilder, VerifyBuilder},
+        CreateArgs, InstructionBuilder, MintArgs, VerificationArgs,
+    },
+    state::{
+        AssetData, PrintSupply, TokenStandard, MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URI_LENGTH,
+    },
+    utils::puffed_out_string,
 };
 pub fn add_party_nft(
     ctx: Context<AddPartyNFT>,
-    name: String,
-    symbol: String,
-    uri: String,
+    input_name: String,
+    input_symbol: String,
+    input_uri: String,
     max_supply: Option<u64>,
 ) -> Result<()> {
-    // check if in emergency when everywhing halted
     require!(
         !ctx.accounts.voting_info.emergency,
         VotingError::VotingInEmergencyMode
     );
-
     // parties can be added only in initial state, so it`s up to voting authority
     // to decide when start voting
     // we can argue that people can create parties, pay for everything and then voting
@@ -31,53 +37,57 @@ pub fn add_party_nft(
         ctx.accounts.voting_info.voting_state == VotingState::Registrations,
         VotingError::PartyRegistrationsNotAllowed
     );
+    require!(
+        solana_program::sysvar::instructions::check_id(&ctx.accounts.instructions.key()),
+        VotingError::SysvarInstructionsMismatch
+    );
 
-    mint_to(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: ctx.accounts.mint.to_account_info(),
-                to: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.party_creator.to_account_info(),
-            },
-        ),
-        1,
-    )?;
-
-    let party_bump = *ctx.bumps.get("party").unwrap();
-
+    let print_supply = match max_supply {
+        Some(0) => PrintSupply::Zero,
+        Some(x) => PrintSupply::Limited(x),
+        None => PrintSupply::Unlimited,
+    };
     let creator = vec![mpl_token_metadata::state::Creator {
         address: ctx.accounts.party.key(),
         verified: false,
         share: 100,
     }];
+    let party_bump = *ctx.bumps.get("party").unwrap();
 
-    // create metadata account
+    let name = puffed_out_string(&input_name, MAX_NAME_LENGTH);
+    let symbol = puffed_out_string(&input_symbol, MAX_SYMBOL_LENGTH);
+    let uri = puffed_out_string(&input_uri, MAX_URI_LENGTH);
+
+    let mut asset = AssetData::new(TokenStandard::ProgrammableNonFungible, name, symbol, uri);
+    asset.seller_fee_basis_points = 0;
+    asset.creators = Some(creator);
+
+    msg!("here {}", ctx.accounts.mint.key());
     invoke_signed(
-        &create_metadata_accounts_v3(
-            ctx.accounts.token_metadata_program.key(),
-            ctx.accounts.metadata_account.key(),
-            ctx.accounts.mint.key(),
-            ctx.accounts.party_creator.key(),
-            ctx.accounts.voting_authority.key(),
-            ctx.accounts.party.key(),
-            name,
-            symbol,
-            uri,
-            Some(creator),
-            0,
-            true,
-            true,
-            None,
-            None,
-            None,
-        ),
+        &CreateBuilder::new()
+            .metadata(ctx.accounts.metadata_account.key())
+            .master_edition(ctx.accounts.master_edition_account.key())
+            .mint(ctx.accounts.mint.key())
+            .authority(ctx.accounts.party_creator.key())
+            .payer(ctx.accounts.voting_authority.key())
+            .update_authority(ctx.accounts.party.key())
+            .initialize_mint(false)
+            .update_authority_as_signer(true)
+            .build(CreateArgs::V1 {
+                asset_data: asset,
+                decimals: Some(0),
+                print_supply: Some(print_supply),
+            })
+            .unwrap()
+            .instruction(),
         &[
             ctx.accounts.metadata_account.to_account_info(),
+            ctx.accounts.master_edition_account.to_account_info(),
             ctx.accounts.voting_authority.to_account_info(),
             ctx.accounts.mint.to_account_info(),
             ctx.accounts.party_creator.to_account_info(),
             ctx.accounts.party.to_account_info(),
+            ctx.accounts.instructions.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
             ctx.accounts.rent.to_account_info(),
         ],
@@ -89,16 +99,17 @@ pub fn add_party_nft(
         ]],
     )?;
 
-    // sign with creator
     invoke_signed(
-        &sign_metadata(
-            ctx.accounts.token_metadata_program.key(),
-            ctx.accounts.metadata_account.key(),
-            ctx.accounts.party.key(),
-        ),
+        &VerifyBuilder::new()
+            .authority(ctx.accounts.party.key())
+            .metadata(ctx.accounts.metadata_account.key())
+            .build(VerificationArgs::CreatorV1)
+            .unwrap()
+            .instruction(),
         &[
             ctx.accounts.metadata_account.to_account_info(),
             ctx.accounts.party.to_account_info(),
+            ctx.accounts.instructions.to_account_info(),
         ],
         &[&[
             PARTY_SEED,
@@ -108,28 +119,33 @@ pub fn add_party_nft(
         ]],
     )?;
 
-    // create master edition
     invoke_signed(
-        &create_master_edition_v3(
-            ctx.accounts.token_metadata_program.key(),
-            ctx.accounts.master_edition_account.key(),
-            ctx.accounts.mint.key(),
-            ctx.accounts.party.key(),
-            ctx.accounts.party_creator.key(),
-            ctx.accounts.metadata_account.key(),
-            ctx.accounts.voting_authority.key(),
-            max_supply,
-        ),
+        &MintBuilder::new()
+            .token(ctx.accounts.master_token_account.key())
+            .metadata(ctx.accounts.metadata_account.key())
+            .master_edition(ctx.accounts.master_edition_account.key())
+            .token_record(ctx.accounts.master_token_record.key())
+            .mint(ctx.accounts.mint.key())
+            .authority(ctx.accounts.party.key())
+            .payer(ctx.accounts.voting_authority.key())
+            .build(MintArgs::V1 {
+                amount: 1,
+                authorization_data: None,
+            })
+            .unwrap()
+            .instruction(),
         &[
+            ctx.accounts.master_token_record.to_account_info(),
             ctx.accounts.master_edition_account.to_account_info(),
             ctx.accounts.mint.to_account_info(),
+            ctx.accounts.master_token_account.to_account_info(),
             ctx.accounts.voting_authority.to_account_info(),
-            ctx.accounts.party_creator.to_account_info(),
             ctx.accounts.party.to_account_info(),
             ctx.accounts.metadata_account.to_account_info(),
-            ctx.accounts.token_program.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.rent.to_account_info(),
+            ctx.accounts.instructions.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.associated_token_program.to_account_info(),
         ],
         &[&[
             PARTY_SEED,
@@ -145,7 +161,8 @@ pub fn add_party_nft(
     party.voting_info = ctx.accounts.voting_info.key();
     party.have_nft = true;
     party.master_mint = ctx.accounts.mint.key();
-    party.master_token = ctx.accounts.token_account.key();
+    // TODO We probably dont need this as we are not minting , creating only
+    //party.master_token = ctx.accounts.token_account.key();
     party.master_metadata = ctx.accounts.metadata_account.key();
     party.master_edition = ctx.accounts.master_edition_account.key();
 
@@ -194,21 +211,26 @@ pub struct AddPartyNFT<'info> {
         associated_token::mint = mint,
         associated_token::authority = party,
     )]
-    pub token_account: Account<'info, TokenAccount>,
-
+    pub master_token_account: Box<Account<'info, TokenAccount>>,
+    /// CHECK: We are about to create this, metaplex check correctness
+    /// https://github.com/metaplex-foundation/metaplex-program-library/blob/e4df367c29109fde2ca824b3cb40fc257b0e6329/token-metadata/program/src/processor/metadata/mint.rs#L177
+    #[account(mut)]
+    pub master_token_record: UncheckedAccount<'info>,
     /// CHECK: We are about to create this and Metaplex will check if address is correct
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/utils/metadata.rs#LL102C38-L102C51
     #[account(mut)]
-    pub metadata_account: AccountInfo<'info>,
+    pub metadata_account: UncheckedAccount<'info>,
 
     /// CHECK: We are about to create this and Metaplex will check if address is correct
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/processor/edition/create_master_edition_v3.rs#L43
     #[account(mut)]
-    pub master_edition_account: AccountInfo<'info>,
+    pub master_edition_account: UncheckedAccount<'info>,
 
     pub token_metadata_program: Program<'info, TokenMetaDataProgram>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,
     pub rent: Sysvar<'info, Rent>,
+    /// CHECK: we can`t check this with anchor, so we will check manually in code
+    pub instructions: UncheckedAccount<'info>,
 }

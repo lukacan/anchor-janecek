@@ -69,6 +69,7 @@ pub mod janecek_method {
         instructions::change_nft_data(ctx, input_name, input_symbol, input_uri, is_mutable)
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct TokenMetaDataProgram;
 

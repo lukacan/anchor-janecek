@@ -41,8 +41,9 @@ export async function init_env(test_env: TestEnviroment) {
 
     test_env.token_account = token.getAssociatedTokenAddressSync(test_env.mint.publicKey, test_env.Party, true);
     test_env.another_token_account = token.getAssociatedTokenAddressSync(test_env.another_mint.publicKey, test_env.anotherParty, true);
-    test_env.token_account_voter1 = token.getAssociatedTokenAddressSync(test_env.mint_voter1.publicKey, test_env.VoterCreator.publicKey, false);
+    test_env.token_account_voter1 = token.getAssociatedTokenAddressSync(test_env.mint.publicKey, test_env.VoterCreator.publicKey, false);
     test_env.token_account_voter2 = token.getAssociatedTokenAddressSync(test_env.mint_voter2.publicKey, test_env.VoterCreator.publicKey, false);
+
 
 
     // metadatas
@@ -52,6 +53,10 @@ export async function init_env(test_env: TestEnviroment) {
     // master edition
     test_env.master_edition_account = test_env.metaplex.nfts().pdas().masterEdition({ mint: test_env.mint.publicKey });
     test_env.another_master_edition_account = test_env.metaplex.nfts().pdas().masterEdition({ mint: test_env.another_mint.publicKey });
+
+    // master token record
+    test_env.master_token_record = test_env.metaplex.nfts().pdas().tokenRecord({ mint: test_env.mint.publicKey, token: test_env.token_account });
+
 
 
     // voter metadata 1
