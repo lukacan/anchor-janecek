@@ -168,6 +168,23 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
             }).signers([test_env.VotingAuthority]).rpc();
 
         });
+        it(">>> 3. Cannot Update default voting timestamp after Registrations started", async () => {
+            let votingInfoDataBefore = await test_env.program.account.votingInfo.fetch(test_env.VotingInfo);
+
+            let new_timestamp = new anchor.BN(votingInfoDataBefore.votingTimestamp.toNumber() + 1);
+
+            try {
+                await test_env.program.methods.changeDefaultTimestamp(new_timestamp).accounts({
+                    votingAuthority: test_env.VotingAuthority.publicKey,
+                    votingInfo: test_env.VotingInfo,
+                }).signers([test_env.VotingAuthority]).rpc();
+            } catch (error) {
+                const err = anchor.AnchorError.parse(error.logs);
+                assert.strictEqual(err.error.errorCode.code, "NotInitialState");
+            }
+            let votingInfoDataAfter = await test_env.program.account.votingInfo.fetch(test_env.VotingInfo);
+            assert.strictEqual(votingInfoDataAfter.votingTimestamp.toNumber(), votingInfoDataBefore.votingTimestamp.toNumber());
+        });
     })
 
 

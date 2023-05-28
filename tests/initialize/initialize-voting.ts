@@ -28,7 +28,6 @@ export async function InitializeVoting(test_env: TestEnviroment) {
         }
         assert.strictEqual(didNotFail, "");
     });
-
     it(">> 2. Initializing Voting", async () => {
         await test_env.program.methods
             .initializeVoting()
@@ -43,8 +42,6 @@ export async function InitializeVoting(test_env: TestEnviroment) {
         assert.strictEqual(votingInfoData.votingAuthority.toString(), test_env.VotingAuthority.publicKey.toString());
         assert.strictEqual(votingInfoData.bump, test_env.VotingBump);
     });
-
-
     it(">> 3. Cannot Re-Initialize", async () => {
         try {
             await test_env.program.methods

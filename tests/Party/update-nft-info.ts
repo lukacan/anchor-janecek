@@ -60,6 +60,7 @@ export async function updateNFTInfo(test_env: TestEnviroment) {
 
         const new_nft_name = "new Party1 NFT";
 
+        let didNotFail = ""
         try {
             await test_env.program.methods.changeNftData(new_nft_name, nft_before.symbol, nft_before.uri, false).accounts({
                 votingAuthority: test_env.VotingAuthority.publicKey,
@@ -73,14 +74,48 @@ export async function updateNFTInfo(test_env: TestEnviroment) {
                 systemProgram: SystemProgram.programId,
                 instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             }).signers([test_env.PartyCreator]).rpc();
+            didNotFail = "should Failed"
             assert.fail()
         } catch (error) {
             // TODO try to better handle and check the error
         }
+        assert.strictEqual(didNotFail, "");
 
 
 
 
     });
+    it(">>> 3. Cannot update metadata of Party which has no NFT", async () => {
 
+        const nft_before = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
+
+        const new_nft_name = "new Party1 NFT";
+
+        let didNotFail = ""
+
+        try {
+            await test_env.program.methods.changeNftData(new_nft_name, nft_before.symbol, nft_before.uri, false).accounts({
+                votingAuthority: test_env.VotingAuthority.publicKey,
+                partyCreator: test_env.NoNFTPartyCreator.publicKey,
+                votingInfo: test_env.VotingInfo,
+                party: test_env.NoNFTParty,
+                masterMint: test_env.mint.publicKey,
+                masterEdition: test_env.master_edition_account,
+                masterMetadata: test_env.metadata_account,
+                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                systemProgram: SystemProgram.programId,
+                instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            }).signers([test_env.PartyCreator]).rpc();
+            didNotFail = "should Failed"
+
+            assert.fail()
+        } catch (error) {
+            // TODO try to better handle and check the error
+        }
+        assert.strictEqual(didNotFail, "");
+
+
+
+
+    });
 }

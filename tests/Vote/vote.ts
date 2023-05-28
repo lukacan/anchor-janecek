@@ -18,8 +18,6 @@ export async function Vote(test_env: TestEnviroment) {
         }).signers([test_env.VotingAuthority]).rpc();
     });
     it(">>> 1. Voter cannot Vote Negative yet", async () => {
-
-
         try {
             await test_env.program.methods.voteNeg().accounts({
                 votingAuthority: test_env.VotingAuthority.publicKey,
@@ -126,7 +124,43 @@ export async function Vote(test_env: TestEnviroment) {
         assert.strictEqual(voterData.pos2.toString(), SystemProgram.programId.toString());
         assert.strictEqual(voterData.neg1.toString(), SystemProgram.programId.toString());
     });
-    it(">>> 4. Voter cannot Vote Positive and want NFT from Party without NFT", async () => {
+    it(">>> 4. Voter cannot Vote Positive for same Party two times", async () => {
+        const onChainPartyData = await test_env.program.account.party.fetch(test_env.Party);
+
+        try {
+            await test_env.program.methods.votePosNft().accounts({
+                votingAuthority: test_env.VotingAuthority.publicKey,
+                votingInfo: test_env.VotingInfo,
+                partyCreator: onChainPartyData.partyCreator,
+                party: test_env.Party,
+                voterAuthority: test_env.VoterCreator.publicKey,
+                voter: test_env.Voter,
+                voterMint: test_env.mint_voter2.publicKey,
+                voterTokenAccount: test_env.token_account_voter2,
+                voterMetadataAccount: test_env.voter_metadata_account2,
+                voterEditionAccount: test_env.voter_edition_account2,
+                voterEditionMark: test_env.voter_edition_mark2,
+                masterMint: onChainPartyData.masterMint,
+                masterToken: onChainPartyData.masterToken,
+                masterMetadata: onChainPartyData.masterMetadata,
+                masterEdition: onChainPartyData.masterEdition,
+                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                systemProgram: SystemProgram.programId,
+                associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
+                tokenProgram: token.TOKEN_PROGRAM_ID,
+                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+            }).signers([test_env.VoterCreator, test_env.mint_voter2]).rpc();
+            assert.fail()
+        } catch (error) {
+            const err = anchor.AnchorError.parse(error.logs);
+            assert.strictEqual(err.error.errorCode.code, "NoBothPositiveToSame");
+        }
+        const voterData = await test_env.program.account.voter.fetch(test_env.Voter);
+        assert.strictEqual(voterData.pos1.toString(), test_env.Party.toString());
+        assert.strictEqual(voterData.pos2.toString(), SystemProgram.programId.toString());
+        assert.strictEqual(voterData.neg1.toString(), SystemProgram.programId.toString());
+    });
+    it(">>> 5. Voter cannot Vote Positive and want NFT from Party without NFT", async () => {
         const onChainPartyData = await test_env.program.account.party.fetch(test_env.NoNFTParty);
 
 
@@ -165,7 +199,7 @@ export async function Vote(test_env: TestEnviroment) {
         assert.strictEqual(voterData.pos2.toString(), SystemProgram.programId.toString());
         assert.strictEqual(voterData.neg1.toString(), SystemProgram.programId.toString());
     });
-    it(">>> 5. Voter can Vote Positive second time for Party without NFT", async () => {
+    it(">>> 6. Voter can Vote Positive second time for Party without NFT", async () => {
         await test_env.program.methods.votePos().accounts({
             votingAuthority: test_env.VotingAuthority.publicKey,
             votingInfo: test_env.VotingInfo,
@@ -183,7 +217,7 @@ export async function Vote(test_env: TestEnviroment) {
         assert.strictEqual(voterData.pos2.toString(), test_env.NoNFTParty.toString());
         assert.strictEqual(voterData.neg1.toString(), SystemProgram.programId.toString());
     });
-    it(">>> 6. Voter cannot Vote Positive third time", async () => {
+    it(">>> 7. Voter cannot Vote Positive third time", async () => {
         const onChainPartyData = await test_env.program.account.party.fetch(test_env.anotherParty);
 
         try {
@@ -219,7 +253,7 @@ export async function Vote(test_env: TestEnviroment) {
         assert.strictEqual(voterData.pos2.toString(), test_env.NoNFTParty.toString());
         assert.strictEqual(voterData.neg1.toString(), SystemProgram.programId.toString());
     });
-    it(">>> 7. Voter can Vote Negative", async () => {
+    it(">>> 8. Voter can Vote Negative", async () => {
         await test_env.program.methods.voteNeg().accounts({
             votingAuthority: test_env.VotingAuthority.publicKey,
             votingInfo: test_env.VotingInfo,
@@ -237,7 +271,7 @@ export async function Vote(test_env: TestEnviroment) {
         assert.strictEqual(voterData.pos2.toString(), test_env.NoNFTParty.toString());
         assert.strictEqual(voterData.neg1.toString(), test_env.anotherParty.toString());
     });
-    it(">>> 8. Voter cannot Vote Negative two times", async () => {
+    it(">>> 9. Voter cannot Vote Negative two times", async () => {
         try {
             await test_env.program.methods.voteNeg().accounts({
                 votingAuthority: test_env.VotingAuthority.publicKey,

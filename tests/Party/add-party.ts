@@ -4,6 +4,7 @@ import { TestEnviroment } from "../env";
 import { SystemProgram } from '@solana/web3.js';
 import * as token from '@solana/spl-token';
 import { Metaplex } from "@metaplex-foundation/js";
+import { SolanaError } from "../janecek-method-test";
 
 
 const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
@@ -11,7 +12,7 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 );
 
 export async function addParty(test_env: TestEnviroment) {
-    it(">> 1. Add Party: Party 1", async () => {
+    it(">>> 1. Add Party: Party 1", async () => {
         const nft_name = "Party1 nft";
         const nft_symbol = "PRT1NFT";
         const nft_uri = "Party1 nft uri";
@@ -70,9 +71,7 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(partyData.votes.toNumber(), 0);
 
     });
-
-
-    it(">> 2. Add Party: Party 2", async () => {
+    it(">>> 2. Add Party: Party 2", async () => {
         const nft_name = "Party2 nft";
         const nft_symbol = "PRT2NFT";
         const nft_uri = "Party2 nft uri";
@@ -133,7 +132,7 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(partyData.votes.toNumber(), 0);
 
     });
-    it(">> 2. Add Party: Party has no NFT", async () => {
+    it(">>> 3. Add Party: Party has no NFT", async () => {
         await test_env.program.methods
             .addParty()
             .accounts({
@@ -153,4 +152,53 @@ export async function addParty(test_env: TestEnviroment) {
         assert.strictEqual(partyData.votes.toNumber(), 0);
 
     });
+    it(">>> 4. Cannot Re-Initialize without NFT", async () => {
+        try {
+            await test_env.program.methods
+                .addParty()
+                .accounts({
+                    votingAuthority: test_env.VotingAuthority.publicKey,
+                    partyCreator: test_env.NoNFTPartyCreator.publicKey,
+                    votingInfo: test_env.VotingInfo,
+                    party: test_env.NoNFTParty,
+                    systemProgram: SystemProgram.programId,
+                })
+                .signers([test_env.VotingAuthority, test_env.NoNFTPartyCreator]).rpc();
+        } catch (error) {
+            assert.isTrue(SolanaError.contains(error.logs, "already in use"), error.logs)
+        }
+    })
+    it(">>> 5. Cannot Re-Initialize with NFT", async () => {
+        const nft_name = "Party1 nft";
+        const nft_symbol = "PRT1NFT";
+        const nft_uri = "Party1 nft uri";
+
+        const additionalComputeBudgetInstruction =
+            anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({
+                units: 800000,
+            });
+        try {
+            await test_env.program.methods
+                .addPartyNft(nft_name, nft_symbol, nft_uri, null)
+                .accounts({
+                    votingAuthority: test_env.VotingAuthority.publicKey,
+                    partyCreator: test_env.PartyCreator.publicKey,
+                    votingInfo: test_env.VotingInfo,
+                    party: test_env.Party,
+                    mint: test_env.mint.publicKey,
+                    tokenAccount: test_env.token_account,
+                    metadataAccount: test_env.metadata_account,
+                    masterEditionAccount: test_env.master_edition_account,
+                    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
+                    associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
+                    tokenProgram: token.TOKEN_PROGRAM_ID,
+                    rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+                })
+                .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).preInstructions([additionalComputeBudgetInstruction]).rpc();
+            assert.fail()
+        } catch (error) {
+            assert.isTrue(SolanaError.contains(error.logs, "already in use"), error.logs)
+        }
+    })
 }
