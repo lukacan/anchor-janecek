@@ -14,7 +14,7 @@ pub fn reset_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     Ok(())
 }
 
-pub fn change_default_timestamp(ctx: Context<UpdateVotingInfo>, new_timestamp: i64) -> Result<()> {
+pub fn change_default_timestamp(ctx: Context<UpdateVotingInfo>, new_timestamp: u64) -> Result<()> {
     let voting_info = &mut ctx.accounts.voting_info;
     require!(!voting_info.emergency, VotingError::VotingInEmergencyMode);
     require!(
@@ -35,9 +35,6 @@ pub fn start_registrations(ctx: Context<UpdateVotingInfo>) -> Result<()> {
 
     Ok(())
 }
-
-// TODO create function that will set isMutable to False on all parties
-// this has to be done on frontend because of sealevel
 pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
     let voting_info = &mut ctx.accounts.voting_info;
 
@@ -49,7 +46,9 @@ pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
 
     let clock: Clock = Clock::get().unwrap();
 
-    voting_info.voting_started = clock.unix_timestamp;
+    // this is probably not needed as time won`t be negative and i64 will no overflow
+    // u64 in big numbers, but won`t hurt.
+    voting_info.voting_started = u64::try_from(clock.unix_timestamp).unwrap();
     voting_info.voting_ends = match voting_info
         .voting_started
         .checked_add(voting_info.voting_timestamp)
@@ -62,19 +61,6 @@ pub fn start_voting(ctx: Context<UpdateVotingInfo>) -> Result<()> {
 
     Ok(())
 }
-// pub fn add_voting_authority(
-//     ctx: Context<UpdateVotingInfo>,
-//     new_voting_authority: Pubkey,
-// ) -> Result<()> {
-//     let voting_info = &mut ctx.accounts.voting_info;
-//     require!(
-//         voting_info.voting_state == VotingState::Initialized,
-//         VotingError::VotingInWrongState
-//     );
-//     voting_info.voting_authority = new_voting_authority;
-//     Ok(())
-// }
-
 #[derive(Accounts)]
 pub struct UpdateVotingInfo<'info> {
     pub voting_authority: Signer<'info>,

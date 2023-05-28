@@ -25,7 +25,7 @@ pub mod janecek_method {
     }
     pub fn change_default_timestamp(
         ctx: Context<UpdateVotingInfo>,
-        new_timestamp: i64,
+        new_timestamp: u64,
     ) -> Result<()> {
         instructions::change_default_timestamp(ctx, new_timestamp)
     }
@@ -64,7 +64,7 @@ pub mod janecek_method {
         input_name: String,
         input_symbol: String,
         input_uri: String,
-        is_mutable: bool,
+        is_mutable: Option<bool>,
     ) -> Result<()> {
         instructions::change_nft_data(ctx, input_name, input_symbol, input_uri, is_mutable)
     }

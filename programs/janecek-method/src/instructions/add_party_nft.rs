@@ -177,9 +177,12 @@ pub struct AddPartyNFT<'info> {
         bump,
     )]
     pub party: Account<'info, Party>,
-    // TODO This is OK
-    // Only owner can change data, so that lamports cannot be changed as we do not own this
-    // SPL trasnfer is also not possible
+    /// We have Private Key of this off-chain, but
+    /// Mint/Freeze authority are changed by MPL
+    /// Owner of Account is SPL Token Program
+    /// even though we have full kepair -> we can sign, based on
+    /// https://github.com/solana-labs/solana-program-library/blob/45764e6737cc7101fad13708ed76e13d8827aa8f/token/program/src/processor.rs#L417
+    /// we can`t do anything without mint/freeze authority signature
     #[account(
         init,
         payer = party_creator,
@@ -199,12 +202,12 @@ pub struct AddPartyNFT<'info> {
     /// CHECK: We are about to create this and Metaplex will check if address is correct
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/utils/metadata.rs#LL102C38-L102C51
     #[account(mut)]
-    pub metadata_account: AccountInfo<'info>,
+    pub metadata_account: UncheckedAccount<'info>,
 
     /// CHECK: We are about to create this and Metaplex will check if address is correct
     /// https://github.com/metaplex-foundation/metaplex-program-library/blob/ae436e9734977773654fb8ea0f72e3ac559253b8/token-metadata/program/src/processor/edition/create_master_edition_v3.rs#L43
     #[account(mut)]
-    pub master_edition_account: AccountInfo<'info>,
+    pub master_edition_account: UncheckedAccount<'info>,
 
     pub token_metadata_program: Program<'info, TokenMetaDataProgram>,
     pub system_program: Program<'info, System>,

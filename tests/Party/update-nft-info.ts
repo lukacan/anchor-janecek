@@ -1,6 +1,7 @@
 import { Metaplex } from "@metaplex-foundation/js";
 import { TestEnviroment } from "../env";
 import * as anchor from "@project-serum/anchor";
+import { SystemProgram } from '@solana/web3.js';
 import { assert } from "chai";
 
 
@@ -15,15 +16,19 @@ export async function updateNFTInfo(test_env: TestEnviroment) {
         const nft_before = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
 
         const new_nft_name = "new Party1 NFT";
-
         await test_env.program.methods.changeNftData(new_nft_name, nft_before.symbol, nft_before.uri, false).accounts({
             votingAuthority: test_env.VotingAuthority.publicKey,
             partyCreator: test_env.PartyCreator.publicKey,
             votingInfo: test_env.VotingInfo,
             party: test_env.Party,
+            masterMint: test_env.mint.publicKey,
+            masterEdition: test_env.master_edition_account,
             masterMetadata: test_env.metadata_account,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+            instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         }).signers([test_env.PartyCreator]).rpc();
+
 
 
         const nft_after = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
@@ -47,6 +52,32 @@ export async function updateNFTInfo(test_env: TestEnviroment) {
         assert.strictEqual(nft_after.edition.isOriginal, true);
         assert.strictEqual(nft_after.edition.supply.toString(), new anchor.BN(0).toString());
         assert.strictEqual(nft_after.edition.maxSupply, null);
+
+    });
+    it(">>> 2. Cannot change metadata of Party1 which are set to not Mutable ", async () => {
+
+        const nft_before = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
+
+        const new_nft_name = "new Party1 NFT";
+
+        try {
+            await test_env.program.methods.changeNftData(new_nft_name, nft_before.symbol, nft_before.uri, false).accounts({
+                votingAuthority: test_env.VotingAuthority.publicKey,
+                partyCreator: test_env.PartyCreator.publicKey,
+                votingInfo: test_env.VotingInfo,
+                party: test_env.Party,
+                masterMint: test_env.mint.publicKey,
+                masterEdition: test_env.master_edition_account,
+                masterMetadata: test_env.metadata_account,
+                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                systemProgram: SystemProgram.programId,
+                instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            }).signers([test_env.PartyCreator]).rpc();
+            assert.fail()
+        } catch (error) {
+            // TODO try to better handle and check the error
+        }
+
 
 
 

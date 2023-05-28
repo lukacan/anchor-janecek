@@ -7,9 +7,9 @@ pub const VOTING_INFO_SEED: &[u8] = b"janecek-voting-seed";
 pub struct VotingInfo {
     pub voting_authority: Pubkey,
     pub emergency: bool,
-    pub voting_started: i64,
-    pub voting_ends: i64,
-    pub voting_timestamp: i64,
+    pub voting_started: u64,
+    pub voting_ends: u64,
+    pub voting_timestamp: u64,
     pub voting_state: VotingState,
     pub bump: u8,
 }

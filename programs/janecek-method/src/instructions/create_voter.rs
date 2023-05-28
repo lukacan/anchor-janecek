@@ -29,7 +29,7 @@ pub fn create_voter(ctx: Context<CreateVoter>) -> Result<()> {
 #[derive(Accounts)]
 pub struct CreateVoter<'info> {
     /// CHECK: This may be good but doublecheck
-    pub voting_authority: AccountInfo<'info>,
+    pub voting_authority: UncheckedAccount<'info>,
     #[account(
         has_one=voting_authority,
         seeds=[VOTING_INFO_SEED,voting_authority.key().as_ref()],
