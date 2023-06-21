@@ -1,0 +1,37 @@
+{
+	"nodes":[
+		{"type":"text","text":"Voting Info\n- voting authority: PK\n- emergency: bool\n- voting_started: u64\n- voting_ends: u64\n- voting_timestamp: u64\n- voting_state: enum VotingState\n- bump: u8\n- \n- seeds:\n\t- \"janecek-voting-seed\",voting_authority","id":"71c924ebe9c2a9f8","x":60,"y":-520,"width":440,"height":360,"color":"3"},
+		{"type":"text","text":"enum VotingState\n- Initialized\n- Registrations\n- Voting","id":"86674c264da66a88","x":-240,"y":-520,"width":190,"height":165,"color":"3"},
+		{"type":"text","text":"Voter\n\n- voter_authority: PK\n- voting_info: PK\n- num_votes: enum NumVotes\n- pos1: PK\n- pos2: PK\n- neg1: PK\n- bump: u8\n- seeds\n\t- \"janecek-voter-seed\" , voter_authority , voting_info","id":"5fa4c3708e1e4b7a","x":600,"y":-80,"width":500,"height":360,"color":"2"},
+		{"type":"text","text":"enum NumVotes\n- zero\n- one\n- two\n- three","id":"f09d22baccc58f7d","x":240,"y":-80,"width":222,"height":191,"color":"2"},
+		{"type":"text","text":"Party\n- party_creator: PK\n- name: [u8,32]\n- voting_info: PK\n- votes: i64\n- created: u64\n- bump: u8\n- \n- seeds:\n\t- \"janecek-party-seed\" , party_creator , voting_info","id":"2155e666805a8aa8","x":600,"y":-600,"width":540,"height":440,"color":"4"},
+		{"type":"text","text":"Voting Authority","id":"718dfa747406d228","x":-1760,"y":-520,"width":250,"height":60,"color":"3"},
+		{"type":"text","text":"initialize\n\n- creates Voting info\n- emergency = false\n- default_timestamp = 7 days or timestampt provided as input\n- voting started = 0\n- state = Initialized","id":"d2ea7658fb8fd2b7","x":-1380,"y":-520,"width":400,"height":270,"color":"3"},
+		{"type":"text","text":"Party Creator","id":"9199b7451ab885f2","x":-1760,"y":-435,"width":250,"height":60,"color":"4"},
+		{"type":"text","text":"Voter Authority","id":"2508e17d91fe86e7","x":-1760,"y":-355,"width":250,"height":60,"color":"2"},
+		{"type":"text","text":"Vote Pos/ Vote Neg\n\n- based on votes left for voter\n- update votes state on voter\n- update number of votes in party","id":"5b239ab2e808ccbb","x":-1510,"y":660,"width":417,"height":178,"color":"2"},
+		{"type":"text","text":"Create Voter\n\n- init voter with voting authority\n- number of Votes  = Three","id":"13d32aaa509904f1","x":-840,"y":240,"width":400,"height":200,"color":"2"},
+		{"type":"text","text":"Notes\n\n- AT THE TIME OF WRITTING:\n\t- 21.6.2023\n- used newest anchor 0.28.0\n- used solana version 1.14.19 as 52.52% on mainnet run on this","id":"e79721b7452cb5be","x":-58,"y":200,"width":520,"height":280,"color":"1"},
+		{"type":"text","text":"Stop voting\n\n- emergency to true","id":"a4f0225b0cc92f69","x":-1093,"y":-1220,"width":240,"height":121,"color":"3"},
+		{"type":"text","text":"Start Registrations\n\n- voting state to Registrations","id":"eb79940dcd52a15e","x":-640,"y":-660,"width":298,"height":157,"color":"3"},
+		{"type":"text","text":"Start Voting\n- voting state to Voting\n- update voting ends\n- update voting started","id":"1cf8ba9f42750a30","x":-622,"y":-345,"width":280,"height":190,"color":"3"},
+		{"type":"text","text":"Reset Voting\n\n- emergency to false","id":"959690b32ed4b983","x":-800,"y":-1080,"width":240,"height":100,"color":"3"},
+		{"type":"text","text":"Change Default Timestamp\n\n- change voting timestamp","id":"705cc0cd6702350f","x":-700,"y":-920,"width":280,"height":120,"color":"3"},
+		{"type":"text","text":"Add Party\n\n- init party with party creator\n- party name is just indicative\n- party created = current time\n- votes are 0 as i64 -> can be negative ","id":"ddd34f204923ada6","x":-2095,"y":60,"width":415,"height":220,"color":"4"},
+		{"id":"46136c04ec67bddd","x":-2095,"y":0,"width":415,"height":60,"color":"3","type":"text","text":""}
+	],
+	"edges":[
+		{"id":"6f8c458194d1119b","fromNode":"f09d22baccc58f7d","fromSide":"right","toNode":"5fa4c3708e1e4b7a","toSide":"left"},
+		{"id":"c7902e2d439dec79","fromNode":"86674c264da66a88","fromSide":"right","toNode":"71c924ebe9c2a9f8","toSide":"left"},
+		{"id":"4cfb5b3c71a2ff4a","fromNode":"d2ea7658fb8fd2b7","fromSide":"top","toNode":"a4f0225b0cc92f69","toSide":"left"},
+		{"id":"9a96ce2bf0197f7a","fromNode":"d2ea7658fb8fd2b7","fromSide":"top","toNode":"959690b32ed4b983","toSide":"left"},
+		{"id":"82c79d643b5ae5d1","fromNode":"d2ea7658fb8fd2b7","fromSide":"right","toNode":"705cc0cd6702350f","toSide":"left","label":"- require initialized state\n- require not emergency"},
+		{"id":"a9177e555244c3df","fromNode":"d2ea7658fb8fd2b7","fromSide":"right","toNode":"eb79940dcd52a15e","toSide":"left","label":"- require initialized state\n- require not emergency"},
+		{"id":"4f8c2044ba34792e","fromNode":"d2ea7658fb8fd2b7","fromSide":"right","toNode":"1cf8ba9f42750a30","toSide":"left","label":"- require registrations state\n- require not emergency"},
+		{"id":"9ad72398c14a4ebc","fromNode":"d2ea7658fb8fd2b7","fromSide":"bottom","toNode":"46136c04ec67bddd","toSide":"top","label":"- require registrations\n- require not emergency\n- require party name length <= 32\n- require also voting authority to sign"},
+		{"id":"036a44aa908a1271","fromNode":"d2ea7658fb8fd2b7","fromSide":"bottom","toNode":"13d32aaa509904f1","toSide":"top","label":"- require registrations or voting\n- require not in emergency"},
+		{"id":"b479607044253e28","fromNode":"d2ea7658fb8fd2b7","fromSide":"bottom","toNode":"5b239ab2e808ccbb","toSide":"top","label":"- require voting state\n- require not emergency\n- require current time <= voting ends\n"},
+		{"id":"45101b7ca71bd347","fromNode":"ddd34f204923ada6","fromSide":"bottom","toNode":"5b239ab2e808ccbb","toSide":"top"},
+		{"id":"9479fce40c7b67cc","fromNode":"13d32aaa509904f1","fromSide":"bottom","toNode":"5b239ab2e808ccbb","toSide":"top"}
+	]
+}
