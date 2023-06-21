@@ -1,7 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import { assert } from "chai";
 import { TestEnviroment } from "../env";
-import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { SystemProgram } from '@solana/web3.js';
 import { SolanaError } from "../janecek-method-test";
 import { airdrop } from "../init_env";
 

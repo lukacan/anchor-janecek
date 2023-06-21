@@ -2,13 +2,7 @@ import { assert } from "chai";
 import { TestEnviroment } from "../env";
 import * as anchor from "@project-serum/anchor";
 import { SystemProgram } from '@solana/web3.js';
-import * as token from '@solana/spl-token';
-import { Metaplex } from "@metaplex-foundation/js";
 
-
-const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
-    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-);
 
 export async function Vote(test_env: TestEnviroment) {
     before("Start Voting", async () => {

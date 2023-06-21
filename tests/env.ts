@@ -1,9 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import { JanecekMethod } from "../target/types/janecek_method";
-import { Metaplex } from "@metaplex-foundation/js";
 
 export class TestEnviroment {
-    [x: string]: any;
 
     // normies
     provider: anchor.AnchorProvider;
