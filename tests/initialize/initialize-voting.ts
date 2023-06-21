@@ -16,7 +16,7 @@ export async function InitializeVoting(test_env: TestEnviroment) {
         let didNotFail = ""
         try {
             await test_env.program.methods
-                .initializeVoting()
+                .initializeVoting(null)
                 .accounts({
                     votingAuthority: test_env.payer.publicKey,
                     votingInfo: test_env.VotingInfo,
@@ -30,7 +30,7 @@ export async function InitializeVoting(test_env: TestEnviroment) {
     });
     it(">> 2. Initializing Voting", async () => {
         await test_env.program.methods
-            .initializeVoting()
+            .initializeVoting(null)
             .accounts({
                 votingAuthority: test_env.VotingAuthority.publicKey,
                 votingInfo: test_env.VotingInfo,
@@ -45,7 +45,7 @@ export async function InitializeVoting(test_env: TestEnviroment) {
     it(">> 3. Cannot Re-Initialize", async () => {
         try {
             await test_env.program.methods
-                .initializeVoting()
+                .initializeVoting(null)
                 .accounts({
                     votingAuthority: test_env.VotingAuthority.publicKey,
                     votingInfo: test_env.VotingInfo,

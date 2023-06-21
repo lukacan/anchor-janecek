@@ -2,10 +2,8 @@ import * as anchor from "@project-serum/anchor";
 import { assert } from "chai";
 import { TestEnviroment } from "../env";
 import { SystemProgram } from '@solana/web3.js';
-import * as token from '@solana/spl-token';
-const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
-    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-);
+import * as constants from "../init_env";
+
 
 export async function UpdateVotingInfo(test_env: TestEnviroment) {
     describe("Update Voting Info", async () => {
@@ -58,30 +56,16 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                 assert.strictEqual(err.error.errorCode.code, "VotingInEmergencyMode");
             }
             try {
-                const nft_name = "Andrejovo nft";
-                const nft_symbol = "ANDNFT";
-                const nft_uri = "Andrejovo nft uri";
-
-
-
                 await test_env.program.methods
-                    .addPartyNft(nft_name, nft_symbol, nft_uri, null)
+                    .addParty(constants.PARTY_NAME1)
                     .accounts({
                         votingAuthority: test_env.VotingAuthority.publicKey,
-                        partyCreator: test_env.PartyCreator.publicKey,
+                        partyCreator: test_env.PartyCreator1.publicKey,
                         votingInfo: test_env.VotingInfo,
-                        party: test_env.Party,
-                        mint: test_env.mint.publicKey,
-                        tokenAccount: test_env.token_account,
-                        metadataAccount: test_env.metadata_account,
-                        masterEditionAccount: test_env.master_edition_account,
-                        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                        party: test_env.Party1,
                         systemProgram: SystemProgram.programId,
-                        associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
-                        tokenProgram: token.TOKEN_PROGRAM_ID,
-                        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
                     })
-                    .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
+                    .signers([test_env.VotingAuthority, test_env.PartyCreator1]).rpc();
             } catch (error) {
                 const err = anchor.AnchorError.parse(error.logs);
                 assert.strictEqual(err.error.errorCode.code, "VotingInEmergencyMode");
@@ -131,30 +115,16 @@ export async function UpdateVotingInfo(test_env: TestEnviroment) {
                 assert.strictEqual(err.error.errorCode.code, "VoterRegistrationsNotAllowed");
             }
             try {
-                const nft_name = "Andrejovo nft";
-                const nft_symbol = "ANDNFT";
-                const nft_uri = "Andrejovo nft uri";
-
-
-
                 await test_env.program.methods
-                    .addPartyNft(nft_name, nft_symbol, nft_uri, new anchor.BN(58416))
+                    .addParty(constants.PARTY_NAME1)
                     .accounts({
                         votingAuthority: test_env.VotingAuthority.publicKey,
-                        partyCreator: test_env.PartyCreator.publicKey,
+                        partyCreator: test_env.PartyCreator1.publicKey,
                         votingInfo: test_env.VotingInfo,
-                        party: test_env.Party,
-                        mint: test_env.mint.publicKey,
-                        tokenAccount: test_env.token_account,
-                        metadataAccount: test_env.metadata_account,
-                        masterEditionAccount: test_env.master_edition_account,
-                        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                        party: test_env.Party1,
                         systemProgram: SystemProgram.programId,
-                        associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
-                        tokenProgram: token.TOKEN_PROGRAM_ID,
-                        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
                     })
-                    .signers([test_env.VotingAuthority, test_env.PartyCreator, test_env.mint]).rpc();
+                    .signers([test_env.VotingAuthority, test_env.PartyCreator1]).rpc();
             } catch (error) {
                 const err = anchor.AnchorError.parse(error.logs);
                 assert.strictEqual(err.error.errorCode.code, "PartyRegistrationsNotAllowed");

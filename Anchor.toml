@@ -13,10 +13,3 @@ wallet = "/home/andrej/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/janecek-method-test.ts"
-
-[test.validator]
-url = "https://api.mainnet-beta.solana.com"
-[test]
-startup_wait = 20000
-[[test.validator.clone]]
-address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"

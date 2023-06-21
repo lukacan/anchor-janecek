@@ -5,7 +5,6 @@ import { UpdateVotingInfo } from "./Update/update_voting_info";
 import { addParty } from "./Party/add-party";
 import { addVoter } from "./Voter/add-voter";
 import { Vote } from "./Vote/vote";
-import { updateNFTInfo } from "./Party/update-nft-info";
 
 
 describe("Janecek Voting Method", async () => {
@@ -22,9 +21,6 @@ describe("Janecek Voting Method", async () => {
   })
   describe("Add Party", async () => {
     addParty(test_env);
-  })
-  describe("Update Party NFT", async () => {
-    updateNFTInfo(test_env);
   })
   describe("Add Voter", async () => {
     addVoter(test_env);

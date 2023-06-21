@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 const DISCRIMINATOR: usize = 8;
+pub const DEFAULT_VOTING_TIMESTAMP:u64 = 7 * 24 * 60 * 60;
 pub const VOTING_INFO_SEED: &[u8] = b"janecek-voting-seed";
 
 #[account]

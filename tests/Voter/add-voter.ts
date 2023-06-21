@@ -1,7 +1,7 @@
 import { TestEnviroment } from "../env";
 
 export async function addVoter(test_env: TestEnviroment) {
-    it("User can add yourself as Voter", async () => {
+    it(">>> 1. User can add yourself as Voter", async () => {
         await test_env.program.methods.createVoter().accounts({
             votingAuthority: test_env.VotingAuthority.publicKey,
             votingInfo: test_env.VotingInfo,

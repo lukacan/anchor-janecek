@@ -14,9 +14,9 @@ pub enum VotingError {
     NotInitialState,
     #[msg("Cannot start Voting if Registrations were not started")]
     StartRegistrationsFirst,
+
     #[msg("Addition overflow")]
     AdditionOverflow,
-
     #[msg("Subtraction underflow")]
     SubtractionUnderflow,
 
@@ -29,9 +29,7 @@ pub enum VotingError {
     #[msg("Vote two Positive first")]
     VoteTwoPosFirst,
 
-    #[msg("Cannot Vote and Obtain NFT for Party that does not give away NFTs")]
-    PartyDoesNotProvideNFT,
+    #[msg("Invalid Party name")]
+    InvalidPartyName,
 
-    #[msg("Provided account Sysvar Instructions has mismatched ID")]
-    SysvarInstructionsMismatch,
 }

@@ -19,89 +19,37 @@ export class TestEnviroment {
 
 
     // parties
-    PartyCreator: anchor.web3.Keypair;
-    Party: anchor.web3.PublicKey;
-    PartyBump: number;
+    PartyCreator1: anchor.web3.Keypair;
+    Party1: anchor.web3.PublicKey;
+    PartyBump1: number;
 
-    anotherPartyCreator: anchor.web3.Keypair;
-    anotherParty: anchor.web3.PublicKey;
-    anotherPartyBump: number;
+    PartyCreator2: anchor.web3.Keypair;
+    Party2: anchor.web3.PublicKey;
+    PartyBump2: number;
 
-    NoNFTPartyCreator: anchor.web3.Keypair;
-    NoNFTParty: anchor.web3.PublicKey;
-    NoNFTPartyBump: number;
+    PartyCreator3: anchor.web3.Keypair;
+    Party3: anchor.web3.PublicKey;
+    PartyBump3: number;
+
+    PartyCreator4: anchor.web3.Keypair;
+    Party4: anchor.web3.PublicKey;
+    PartyBump4: number;
 
     // voter
     VoterCreator: anchor.web3.Keypair;
     Voter: anchor.web3.PublicKey;
     VoterBump: number;
 
-    // pos1
-    mint_voter1: anchor.web3.Keypair;
-    token_account_voter1: anchor.web3.PublicKey;
-
-    voter_metadata_account1: anchor.web3.PublicKey;
-    voter_metadata_account_bump1: number;
-
-    voter_edition_account1: anchor.web3.PublicKey;
-    voter_edition_account_bump1: number;
-
-    voter_edition_mark1: anchor.web3.PublicKey;
-    voter_edition_mark_bump1: number;
-
-
-    // pos2
-    mint_voter2: anchor.web3.Keypair;
-    token_account_voter2: anchor.web3.PublicKey;
-
-    voter_metadata_account2: anchor.web3.PublicKey;
-    voter_metadata_account_bump2: number;
-
-    voter_edition_account2: anchor.web3.PublicKey;
-    voter_edition_account_bump2: number;
-
-    voter_edition_mark2: anchor.web3.PublicKey;
-    voter_edition_mark_bump2: number;
-
-
-    // mints, tokens, metadata , editions,
-    mint: anchor.web3.Keypair;
-    token_account: anchor.web3.PublicKey;
-
-    metadata_account: anchor.web3.PublicKey;
-    metadata_account_bump: number;
-
-    master_edition_account: anchor.web3.PublicKey;
-    master_edition_account_bump: number;
-
-
-    another_mint: anchor.web3.Keypair;
-    another_token_account: anchor.web3.PublicKey;
-
-    another_metadata_account: anchor.web3.PublicKey;
-    another_metadata_account_bump: number;
-
-    another_master_edition_account: anchor.web3.PublicKey;
-    another_master_edition_account_bump: number;
-
-    metaplex: Metaplex;
-
-
     constructor() {
         this.payer = anchor.web3.Keypair.generate();
         this.VotingAuthority = anchor.web3.Keypair.generate();
         this.NewVotingAuthority = anchor.web3.Keypair.generate();
-        this.PartyCreator = anchor.web3.Keypair.generate();
-        this.anotherPartyCreator = anchor.web3.Keypair.generate();
-        this.NoNFTPartyCreator = anchor.web3.Keypair.generate();
-
-        this.mint = anchor.web3.Keypair.generate();
-        this.another_mint = anchor.web3.Keypair.generate();
+        this.PartyCreator1 = anchor.web3.Keypair.generate();
+        this.PartyCreator2 = anchor.web3.Keypair.generate();
+        this.PartyCreator3 = anchor.web3.Keypair.generate();
+        this.PartyCreator4 = anchor.web3.Keypair.generate();
 
         this.VoterCreator = anchor.web3.Keypair.generate();
-        this.mint_voter1 = anchor.web3.Keypair.generate();
-        this.mint_voter2 = anchor.web3.Keypair.generate();
-
 
     }
 }

@@ -6,19 +6,9 @@ use crate::{
         NumVotes, Party, Voter, VotingInfo, VotingState, PARTY_SEED, VOTER_SEED, VOTING_INFO_SEED,
     },
 };
-
+#[access_control(can_vote(&ctx.accounts.voting_info))]
 pub fn vote_pos(ctx: Context<Vote>) -> Result<()> {
-    require!(
-        !ctx.accounts.voting_info.emergency,
-        VotingError::VotingInEmergencyMode
-    );
-    require!(
-        ctx.accounts.voting_info.voting_state == VotingState::Voting,
-        VotingError::VotingNotAllowed
-    );
-
     let voter = &mut ctx.accounts.voter;
-
     match voter.num_votes {
         NumVotes::Three => {
             let party = &mut ctx.accounts.party;
@@ -50,19 +40,9 @@ pub fn vote_pos(ctx: Context<Vote>) -> Result<()> {
         NumVotes::Zero => Err(VotingError::NoMoreVotes.into()),
     }
 }
-
+#[access_control(can_vote(&ctx.accounts.voting_info))]
 pub fn vote_neg(ctx: Context<Vote>) -> Result<()> {
-    require!(
-        !ctx.accounts.voting_info.emergency,
-        VotingError::VotingInEmergencyMode
-    );
-    require!(
-        ctx.accounts.voting_info.voting_state == VotingState::Voting,
-        VotingError::VotingNotAllowed
-    );
-
     let voter = &mut ctx.accounts.voter;
-
     match voter.num_votes {
         NumVotes::Three => Err(VotingError::VoteTwoPosFirst.into()),
         NumVotes::Two => Err(VotingError::VoteTwoPosFirst.into()),
@@ -82,19 +62,32 @@ pub fn vote_neg(ctx: Context<Vote>) -> Result<()> {
         NumVotes::Zero => Err(VotingError::NoMoreVotes.into()),
     }
 }
+fn can_vote(voting_info: &VotingInfo) -> Result<()> {
+    require!(!voting_info.emergency, VotingError::VotingInEmergencyMode);
+    require!(
+        voting_info.voting_state == VotingState::Voting,
+        VotingError::VotingNotAllowed
+    );
+    let clock = Clock::get()?;
+    require!(
+        u64::try_from(clock.unix_timestamp).unwrap() <= voting_info.voting_ends,
+        VotingError::VotingNotAllowed
+    );
+    Ok(())
+}
 
 #[derive(Accounts)]
 pub struct Vote<'info> {
-    /// CHECK: This may be good but doublecheck
-    pub voting_authority: AccountInfo<'info>,
+    /// CHECK: Use of explicit UncheckedAccount
+    pub voting_authority: UncheckedAccount<'info>,
     #[account(
         has_one=voting_authority,
         seeds=[VOTING_INFO_SEED,voting_authority.key().as_ref()],
         bump=voting_info.bump
     )]
     pub voting_info: Account<'info, VotingInfo>,
-    /// CHECK: This may be good but doublecheck
-    pub party_creator: AccountInfo<'info>,
+    /// CHECK: Use of explicit UncheckedAccount
+    pub party_creator: UncheckedAccount<'info>,
     #[account(
         mut,
         has_one = party_creator,

@@ -3,12 +3,19 @@
 use crate::states::*;
 use anchor_lang::prelude::*;
 
-pub fn initialize(ctx: Context<InitializeVoting>) -> Result<()> {
+pub fn initialize(ctx: Context<InitializeVoting>, voting_timestamp: Option<u64>) -> Result<()> {
     let voting_info = &mut ctx.accounts.voting_info;
 
     voting_info.voting_authority = ctx.accounts.voting_authority.key();
     voting_info.emergency = false;
-    voting_info.voting_timestamp = 7 * 24 * 60 * 60; // 7 days
+    match voting_timestamp {
+        Some(timestamp) => {
+            voting_info.voting_timestamp = timestamp;
+        }
+        None => {
+            voting_info.voting_timestamp = DEFAULT_VOTING_TIMESTAMP;
+        }
+    }
     voting_info.voting_started = 0;
     voting_info.voting_state = VotingState::Initialized;
     voting_info.bump = *ctx.bumps.get("voting_info").unwrap();
