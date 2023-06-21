@@ -1,2 +1,2 @@
-# anchor-janecek
-Implementing Janecek Method in Anhcor with Features as NFTS etc.
+# Janecek Method
+Implementation of Janecek method using Anchor
