@@ -42,24 +42,35 @@ export async function Vote(test_env: TestEnviroment) {
     it(">>> 2. Voter can Vote Positive", async () => {
         const onChainPartyData = await test_env.program.account.party.fetch(test_env.Party);
 
-        await test_env.program.methods.votePosNft().accounts({
-            votingAuthority: test_env.VotingAuthority.publicKey,
-            votingInfo: test_env.VotingInfo,
-            partyCreator: onChainPartyData.partyCreator,
-            party: test_env.Party,
-            voterAuthority: test_env.VoterCreator.publicKey,
-            voter: test_env.Voter,
-            voterTokenAccount: test_env.token_account_voter1,
-            masterMint: onChainPartyData.masterMint,
-            masterMetadata: onChainPartyData.masterMetadata,
-            masterEdition: onChainPartyData.masterEdition,
-            masterTokenRecord: test_env.master_token_record,
-            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-            systemProgram: SystemProgram.programId,
-            associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
-            tokenProgram: token.TOKEN_PROGRAM_ID,
-            instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-        }).signers([test_env.VoterCreator]).rpc();
+        console.log(test_env.token_account_voter1);
+
+        try {
+            await test_env.program.methods.votePosNft().accounts({
+                votingAuthority: test_env.VotingAuthority.publicKey,
+                votingInfo: test_env.VotingInfo,
+                partyCreator: onChainPartyData.partyCreator,
+                party: test_env.Party,
+                voterAuthority: test_env.VoterCreator.publicKey,
+                voter: test_env.Voter,
+                voterMint: test_env.mint_voter1.publicKey,
+                voterTokenAccount: test_env.token_account_voter1,
+                voterMetadataAccount: test_env.voter_metadata_account1,
+                voterEditionAccount: test_env.voter_edition_account1,
+                voterEditionMark: test_env.voter_edition_mark1,
+                masterMint: onChainPartyData.masterMint,
+                masterToken: onChainPartyData.masterToken,
+                masterMetadata: onChainPartyData.masterMetadata,
+                masterEdition: onChainPartyData.masterEdition,
+                tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+                systemProgram: SystemProgram.programId,
+                associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
+                tokenProgram: token.TOKEN_PROGRAM_ID,
+                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+            }).signers([test_env.VoterCreator, test_env.mint_voter1]).rpc();
+        } catch (error) {
+            console.log(error)
+            assert.fail()
+        }
 
 
         const partyData = await test_env.program.account.party.fetch(test_env.Party);
@@ -76,7 +87,7 @@ export async function Vote(test_env: TestEnviroment) {
 
 
         const voter_nft1 = await test_env.metaplex.nfts().findByMint({ mintAddress: test_env.mint.publicKey });
-        //console.log(voter_nft1)
+        console.log(voter_nft1)
         const voter_token_account = await token.getAccount(test_env.provider.connection, test_env.token_account_voter1);
         // console.log(test_env.mint.publicKey.toString());
         // console.log(voter_token_account)

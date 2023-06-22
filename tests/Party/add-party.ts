@@ -108,7 +108,6 @@ export async function addParty(test_env: TestEnviroment) {
                     associatedTokenProgram: token.ASSOCIATED_TOKEN_PROGRAM_ID,
                     tokenProgram: token.TOKEN_PROGRAM_ID,
                     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-                    instructions: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
                 })
                 .signers([test_env.VotingAuthority, test_env.anotherPartyCreator, test_env.another_mint]).rpc();
         } catch (error) {

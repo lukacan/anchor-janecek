@@ -27,12 +27,12 @@ describe("Janecek Voting Method", async () => {
   // describe("Update Party NFT", async () => {
   //   updateNFTInfo(test_env);
   // })
-  // describe("Add Voter", async () => {
-  //   addVoter(test_env);
-  // })
-  // describe("Vote", async () => {
-  //   Vote(test_env);
-  // })
+  describe("Add Voter", async () => {
+    addVoter(test_env);
+  })
+  describe("Vote", async () => {
+    Vote(test_env);
+  })
   // describe("Test NFT", async () => {
   //   testNFT(test_env);
   // })

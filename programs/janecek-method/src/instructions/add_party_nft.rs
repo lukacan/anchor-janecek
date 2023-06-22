@@ -165,6 +165,7 @@ pub fn add_party_nft(
     //party.master_token = ctx.accounts.token_account.key();
     party.master_metadata = ctx.accounts.metadata_account.key();
     party.master_edition = ctx.accounts.master_edition_account.key();
+    party.master_token = ctx.accounts.master_token_account.key();
 
     let clock: Clock = Clock::get().unwrap();
     party.created = clock.unix_timestamp;
