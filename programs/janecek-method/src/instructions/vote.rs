@@ -78,7 +78,8 @@ fn can_vote(voting_info: &VotingInfo) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct Vote<'info> {
-    /// CHECK: Use of explicit UncheckedAccount
+    /// CHECK: Use of explicit UncheckedAccount, but it is safe as we check
+    /// this compared to what is stored in our PDA Accoutns
     pub voting_authority: UncheckedAccount<'info>,
     #[account(
         has_one=voting_authority,
@@ -86,7 +87,8 @@ pub struct Vote<'info> {
         bump=voting_info.bump
     )]
     pub voting_info: Account<'info, VotingInfo>,
-    /// CHECK: Use of explicit UncheckedAccount
+    /// CHECK: Use of explicit UncheckedAccount, but it is safe as we check
+    /// this compared to what is stored in our PDA Accoutns
     pub party_creator: UncheckedAccount<'info>,
     #[account(
         mut,
